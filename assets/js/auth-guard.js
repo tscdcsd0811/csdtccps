@@ -69,6 +69,13 @@
         // Authorized: reveal the page.
         document.documentElement.classList.remove("auth-checking");
 
+        console.log("[auth-guard] signed in as", session.user.email, "role:", profile.role);
+
+        var emailLabel = document.getElementById("auth-user-email");
+        if (emailLabel) {
+            emailLabel.textContent = session.user.email + " (" + profile.role + ")";
+        }
+
         var logoutBtn = document.getElementById("btn-logout");
         if (logoutBtn) {
             logoutBtn.addEventListener("click", async function () {
