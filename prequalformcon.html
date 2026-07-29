@@ -373,23 +373,45 @@
         .btn-submit-pdfs:hover {
             background-color: #138496;
         }
-        .btn-logout {
-            background-color: #ffffff;
-            color: #dc3545;
-            border: 1px solid #dc3545;
+        .top-user-bar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 14px;
+            padding: 0 0 8px;
+            flex-wrap: wrap;
         }
-        .btn-logout:hover {
-            background-color: #dc3545;
-            color: #ffffff;
+        .top-user-bar .user-email {
+            font-size: 12px;
+            color: #555;
         }
-        .btn-change-password {
-            background-color: #ffffff;
+        .btn-link {
+            background: none;
+            border: none;
+            padding: 0;
+            font: inherit;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: underline;
+            box-shadow: none;
+        }
+        .btn-link-password {
             color: #0056b3;
-            border: 1px solid #0056b3;
         }
-        .btn-change-password:hover {
-            background-color: #0056b3;
-            color: #ffffff;
+        .btn-link-password:hover {
+            color: #003d80;
+        }
+        .btn-link-logout {
+            color: #dc3545;
+        }
+        .btn-link-logout:hover {
+            color: #a71d2a;
+        }
+        .readonly-field {
+            background-color: #f0f0f0 !important;
+            color: #333;
+            cursor: not-allowed;
         }
 
         .btn:disabled {
@@ -484,6 +506,11 @@
 <form id="qualificationsForm" onsubmit="handleFormSubmission(event)" autocomplete="off">
     
     <div class="top-container">
+        <div class="top-user-bar">
+            <span id="auth-user-email" class="user-email"></span>
+            <button type="button" id="btn-change-password" class="btn-link btn-link-password">Change Password</button>
+            <button type="button" id="btn-logout" class="btn-link btn-link-logout">Log out</button>
+        </div>
         <div class="header-panel">
             <div class="header-title-wrapper">
                 <h2>ENGINEER'S QUALIFICATION APPROVAL REQUEST FORM</h2>
@@ -494,9 +521,6 @@
                 <button type="button" id="btn-reset-form" class="btn btn-reset" onclick="confirmResetForm()">Clear & Reset Form</button>
                 <button type="button" id="btn-submit-pdfs" class="btn btn-submit-pdfs" onclick="handleFormSubmission(event, true)">Generate PDF forms</button>
                 <button type="submit" id="btn-submit-email" class="btn btn-submit">Generate Email Draft & PDF forms</button>
-                <span id="auth-user-email" style="font-size:12px; color:#555; margin-right:4px;"></span>
-                <button type="button" id="btn-change-password" class="btn btn-change-password">Change Password</button>
-                <button type="button" id="btn-logout" class="btn btn-logout">Log out</button>
             </div>
         </div>
         
@@ -511,9 +535,7 @@
         <div class="global-fields-panel">
             <div style="display: flex; align-items: center; gap: 10px; flex-grow: 1;">
                 <label style="font-weight: bold; white-space: nowrap;">Company Name</label>
-                <select id="global_company" class="company-select yellow-cell" style="width: 100%; height: 32px; border: 1px solid #ccc; font-size: 14px;" onchange="saveFormState()">
-                    <option value="">-- Loading Companies List... --</option>
-                </select>
+                <input type="text" id="global_company" class="company-select yellow-cell readonly-field" style="width: 100%; height: 32px; border: 1px solid #ccc; font-size: 14px;" value="" placeholder="Loading your company..." readonly>
             </div>
             <div style="display: flex; align-items: center; gap: 10px; width: 300px;">
                 <label style="font-weight: bold; white-space: nowrap;">Region</label>
@@ -889,9 +911,6 @@
     const STORAGE_KEY = 'engineer_form_persistent_state';
     const STORAGE_TTL_MS = 1 * 60 * 60 * 1000; // 1 hour — PII auto-expires after this, even if the tab stays open
 
-    const COMPANIES_LIST_PAGE = "companieslist.html";
-    let companiesData = null;
-
     // sha384 of pdfjs-dist@3.11.174/build/pdf.worker.min.js — computed from the actual npm package bytes.
     // If PDFJS_VERSION below is ever changed, this hash must be regenerated for the new version.
     const PDFJS_VERSION = "3.11.174";
@@ -1087,77 +1106,38 @@
         URL.revokeObjectURL(linkElement.href);
     }
 
-    async function loadCompaniesList() {
-        try {
-            const cacheBustedUrl = COMPANIES_LIST_PAGE + '?_=' + Date.now();
-            const response = await fetch(cacheBustedUrl);
-            if (!response.ok) {
-                throw new Error('Could not fetch "' + COMPANIES_LIST_PAGE + '" (HTTP ' + response.status + ').');
-            }
-            const htmlText = await response.text();
+    // Company Name is no longer picked from a dropdown: it's auto-filled from
+    // the signed-in user's own profile (companyid/companyname columns), in
+    // the same "companyid - companyname" format the dropdown used to produce.
+    // auth-guard.js exposes this as window.authProfile once it's loaded, and
+    // fires an "auth-ready" event on document for the case where auth-guard
+    // finishes loading it after this page's own DOMContentLoaded handler runs.
+    function applyCompanyFromProfile(authProfile) {
+        const companyEl = document.getElementById('global_company');
+        if (!companyEl || !authProfile) return;
 
-            const parser = new DOMParser();
-            const dataDoc = parser.parseFromString(htmlText, 'text/html');
-            const table = dataDoc.getElementById('companiesTable');
-            if (!table) {
-                throw new Error('Could not find a table with id="companiesTable".');
-            }
-
-            const headerCells = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim().toLowerCase());
-            const nameColIdx = headerCells.indexOf('company name');
-            const idColIdx = headerCells.indexOf('company id');
-            const voltageColIdx = headerCells.indexOf('voltage level');
-            if (nameColIdx === -1 || idColIdx === -1) {
-                throw new Error('Could not find "Company Name" and "Company ID" columns.');
-            }
-
-            const bodyRows = Array.from(table.querySelectorAll('tbody tr'));
-            if (bodyRows.length === 0) {
-                throw new Error('The companiesTable has no data rows.');
-            }
-
-            companiesData = bodyRows.map(tr => {
-                const cells = Array.from(tr.querySelectorAll('td')).map(td => td.textContent.trim());
-                return {
-                    name: cells[nameColIdx] || '',
-                    id: cells[idColIdx] || '',
-                    voltage: voltageColIdx !== -1 ? (cells[voltageColIdx] || '') : ''
-                };
-            }).filter(c => c.name);
-
-        } catch (err) {
-            console.error('Failed to load Companies List:', err);
-            companiesData = null;
-            alert('Unable to load the Companies List dropdown.\n\n' + err.message);
+        if (authProfile.role !== 'external') {
+            // This page requires the "external" role (see REQUIRED_ROLE above),
+            // so in practice this should never happen, but guard anyway.
+            return;
         }
+
+        if (!authProfile.companyname) {
+            companyEl.value = '';
+            companyEl.dataset.companyId = '';
+            companyEl.placeholder = 'No company on file for this account — contact your administrator.';
+            return;
+        }
+
+        const concatenatedVal = (authProfile.companyid || '') + ' - ' + authProfile.companyname;
+        companyEl.value = concatenatedVal;
+        companyEl.dataset.companyId = authProfile.companyid || '';
+        saveFormState();
     }
 
-    function populateCompanySelect(selectElement) {
-        if (!selectElement) return;
-        const previousValue = selectElement.value;
-        selectElement.innerHTML = '';
-
-        const blankOption = document.createElement('option');
-        blankOption.value = '';
-        blankOption.textContent = companiesData ? '-- Select Company --' : '-- Unable to load Companies List --';
-        selectElement.appendChild(blankOption);
-
-        if (companiesData) {
-            companiesData.forEach(c => {
-                const opt = document.createElement('option');
-                const concatenatedVal = c.id + ' - ' + c.name;
-                opt.value = concatenatedVal;
-                opt.dataset.companyId = c.id;
-                opt.dataset.voltageLevel = c.voltage || '';
-                opt.textContent = concatenatedVal;
-                selectElement.appendChild(opt);
-            });
-        }
-
-        if (previousValue) {
-            selectElement.value = previousValue;
-        }
-    }
+    document.addEventListener('auth-ready', function (e) {
+        applyCompanyFromProfile(e.detail);
+    });
 
     function triggerSequenceVerificationPrompt(event) {
         const dialogText = "Please make sure the file you will be uploading here is a merged file of the following IN SEQUENCE:\n\n" +
@@ -1339,7 +1319,9 @@
         });
 
         const globalState = {
-            company: document.getElementById('global_company').value,
+            // Company Name is auto-filled from the signed-in user's profile on every
+            // load (see applyCompanyFromProfile), so it's intentionally not persisted
+            // here or restored in loadFormState().
             region: document.getElementById('global_region').value,
             records: state,
             savedAt: Date.now() // used to auto-expire this PII from localStorage — see loadFormState()
@@ -1367,7 +1349,6 @@
                     return;
                 }
 
-                if (parsedState.company !== undefined) document.getElementById('global_company').value = parsedState.company;
                 if (parsedState.region !== undefined) document.getElementById('global_region').value = parsedState.region;
 
                 if (parsedState && parsedState.records && parsedState.records.length > 0) {
@@ -1386,9 +1367,9 @@
         const message = "Are you sure you want to completely clear the rows and reset the entry form?\nAll unsubmitted input details will be lost permanently.";
         if (confirm(message)) {
             localStorage.removeItem(STORAGE_KEY);
-            document.getElementById('global_company').value = "";
             document.getElementById('global_region').value = "";
             loadFormState();
+            if (window.authProfile) applyCompanyFromProfile(window.authProfile);
         }
     }
 
@@ -1480,7 +1461,7 @@
         const regionEl = document.getElementById('global_region');
         
         if (!companyEl.value) {
-            alert("Please select a Company Name from the header block.");
+            alert("Your Company Name could not be loaded automatically. Please refresh the page or contact your administrator.");
             companyEl.focus();
             return false;
         }
@@ -1587,9 +1568,9 @@
             }
             const templateBytes = await response.arrayBuffer();
             
-            const globalCompanySelect = document.getElementById('global_company');
-            const companyNameVal = globalCompanySelect.value;
-            const companyIdVal = globalCompanySelect.options[globalCompanySelect.selectedIndex].dataset.companyId || 'nocompanyid';
+            const globalCompanyField = document.getElementById('global_company');
+            const companyNameVal = globalCompanyField.value;
+            const companyIdVal = globalCompanyField.dataset.companyId || 'nocompanyid';
             const regionVal = document.getElementById('global_region').value;
             const safeRegionVal = (regionVal || 'noregion').replace(/[^a-z0-9]/gi, '_');
             const dateStrForFileName = getDateDDMMMYY();
@@ -1809,9 +1790,13 @@
 
     document.addEventListener('DOMContentLoaded', async function() {
         await initPdfWorkerWithIntegrity();
-        await loadCompaniesList();
-        populateCompanySelect(document.getElementById('global_company'));
         loadFormState();
+        // auth-guard.js may already have finished loading the profile before
+        // this listener is attached (window.authProfile), or may still be
+        // in flight (the "auth-ready" listener registered above covers that).
+        if (window.authProfile) {
+            applyCompanyFromProfile(window.authProfile);
+        }
         requestAnimationFrame(syncAllRecordHeights);
     });
 

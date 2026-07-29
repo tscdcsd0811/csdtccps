@@ -6,6 +6,14 @@ create table if not exists public.profiles (
     id uuid primary key references auth.users (id) on delete cascade,
     email text,
     role text not null default 'unassigned' check (role in ('internal', 'external', 'unassigned')),
+    -- companyid / companyname: set for 'external' users only. Used to
+    -- auto-fill the read-only Company Name field on prequalformcon.html
+    -- as "companyid - companyname".
+    companyid text,
+    companyname text,
+    -- flname: the user's full name, shown on prequalformint.html to
+    -- auto-fill the Interviewer 1 / Examiner 1 name field.
+    flname text,
     created_at timestamptz not null default now()
 );
 

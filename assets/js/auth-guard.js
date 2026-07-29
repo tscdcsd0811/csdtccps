@@ -18,7 +18,16 @@
  *   <button id="btn-logout">            - signs the user out
  *   <button id="btn-change-password">   - opens a self-service
  *                                          change-password modal
- *   <span id="auth-user-email">         - filled with "email (role)"
+ *   <span id="auth-user-email">         - filled with the signed-in email
+ *
+ * Once the signed-in user's profile has been loaded, this file exposes it as
+ * window.authProfile = { id, email, role, companyid, companyname, flname } and fires
+ * a "auth-ready" event on document with that same object as event.detail.
+ * Pages can do either of:
+ *   if (window.authProfile) { ...use it... }
+ *   document.addEventListener("auth-ready", function (e) { ...use e.detail... });
+ * to cover both the case where auth-guard finishes before or after the
+ * page's own setup code runs.
  */
 (function () {
     "use strict";
@@ -53,7 +62,7 @@
 
         var profileResult = await client
             .from("profiles")
-            .select("role")
+            .select("role, companyid, companyname, flname")
             .eq("id", session.user.id)
             .single();
 
@@ -79,8 +88,18 @@
 
         var emailLabel = document.getElementById("auth-user-email");
         if (emailLabel) {
-            emailLabel.textContent = session.user.email + " (" + profile.role + ")";
+            emailLabel.textContent = session.user.email;
         }
+
+        window.authProfile = {
+            id: session.user.id,
+            email: session.user.email,
+            role: profile.role,
+            companyid: profile.companyid || "",
+            companyname: profile.companyname || "",
+            flname: profile.flname || ""
+        };
+        document.dispatchEvent(new CustomEvent("auth-ready", { detail: window.authProfile }));
 
         var logoutBtn = document.getElementById("btn-logout");
         if (logoutBtn) {
