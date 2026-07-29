@@ -1,6 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="auth-checking">
 <head>
+    <style>
+        html.auth-checking body { display: none !important; }
+    </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Engineers Qualification Board</title>
@@ -368,6 +371,15 @@
         .btn-submit-pdfs:hover {
             background-color: #138496;
         }
+        .btn-logout {
+            background-color: #ffffff;
+            color: #dc3545;
+            border: 1px solid #dc3545;
+        }
+        .btn-logout:hover {
+            background-color: #dc3545;
+            color: #ffffff;
+        }
 
         .btn:disabled {
             opacity: 0.6;
@@ -451,6 +463,10 @@
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"
             integrity="sha384-/1qUCSGwTur9vjf/z9lmu/eCUYbpOTgSjmpbMQZ1/CtX2v/WcAIKqRv+U1DUCG6e"
             crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase-config.js"></script>
+    <script>window.REQUIRED_ROLE = "internal";</script>
+    <script src="assets/js/auth-guard.js"></script>
 </head>
 <body>
 
@@ -467,6 +483,7 @@
                 <button type="button" id="btn-reset-form" class="btn btn-reset" onclick="confirmResetForm()">Clear & Reset Form</button>
                 <button type="button" id="btn-submit-pdfs" class="btn btn-submit-pdfs" onclick="handleFormSubmission(event, true)">Generate PDF forms</button>
                 <button type="submit" id="btn-submit-email" class="btn btn-submit">Generate Email Draft & PDF forms</button>
+                <button type="button" id="btn-logout" class="btn btn-logout">Log out</button>
             </div>
         </div>
         
