@@ -1,28 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" class="auth-checking">
+<html lang="en">
 <head>
-    <style>
-        html.auth-checking body { display: none !important; }
-        #auth-bar {
-            display: flex;
-            justify-content: flex-end;
-            padding: 6px 10px;
-            background: #f1f3f5;
-            border-bottom: 1px solid #ddd;
-            font-family: Arial, sans-serif;
-            font-size: 12px;
-        }
-        #btn-logout {
-            background: none;
-            border: 1px solid #999;
-            border-radius: 4px;
-            padding: 4px 10px;
-            font-size: 12px;
-            cursor: pointer;
-            color: #333;
-        }
-        #btn-logout:hover { background: #e9ecef; }
-    </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Engineers Qualification Board</title>
@@ -473,13 +451,8 @@
     <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"
             integrity="sha384-/1qUCSGwTur9vjf/z9lmu/eCUYbpOTgSjmpbMQZ1/CtX2v/WcAIKqRv+U1DUCG6e"
             crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="assets/js/supabase-config.js"></script>
-    <script>window.REQUIRED_ROLE = "external";</script>
-    <script src="assets/js/auth-guard.js"></script>
 </head>
 <body>
-<div id="auth-bar"><button type="button" id="btn-logout">Log out</button></div>
 
 <form id="qualificationsForm" onsubmit="handleFormSubmission(event)" autocomplete="off">
     
