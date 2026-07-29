@@ -1,7 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="auth-checking">
 
 <head>
+    <style>
+        html.auth-checking body { display: none !important; }
+    </style>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" name="viewport">
     <title>Pre-Qualification Approval Form</title>
@@ -303,6 +306,50 @@
             background-color: #8a2020;
         }
 
+        /* Logout button styling */
+        .logout-btn {
+            background-color: #ffffff;
+            color: #b02a2a;
+            border: 1px solid #b02a2a;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+            margin-left: 8px;
+        }
+
+        .logout-btn:hover {
+            background-color: #b02a2a;
+            color: #ffffff;
+        }
+
+        .change-pw-btn {
+            background-color: #ffffff;
+            color: #0056b3;
+            border: 1px solid #0056b3;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+            margin-left: 8px;
+        }
+
+        .change-pw-btn:hover {
+            background-color: #0056b3;
+            color: #ffffff;
+        }
+
+        #auth-user-email {
+            font-size: 12px;
+            color: #555;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
         /* Modal overlay */
         #upload-modal {
             display: none;
@@ -523,9 +570,17 @@
                 width: 100%;
                 max-width: 320px;
                 margin-right: 0 !important;
+                margin-left: 0 !important;
                 padding: 12px 16px;
                 font-size: 15px;
                 min-height: 44px;
+            }
+
+            #auth-user-email {
+                display: block;
+                width: 100%;
+                text-align: center;
+                margin-right: 0;
             }
 
             .page-scale-wrapper {
@@ -565,6 +620,10 @@
             }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="assets/js/supabase-config.js"></script>
+    <script>window.REQUIRED_ROLE = "internal";</script>
+    <script src="assets/js/auth-guard.js"></script>
 </head>
 
 <body>
@@ -577,7 +636,7 @@
         </div>
     </div>
     
-    <div class="action-bar"><button class="upload-btn no-print" onclick="openUploadModal()">📄 Upload PDF</button> <button class="reset-btn no-print" onclick="resetFormClick()" type="button">🗑 Reset / Clear Form</button> <button class="print-btn no-print" id="print-form-btn" onclick="validateAndPrint()">Print Form</button></div>
+    <div class="action-bar"><button class="upload-btn no-print" onclick="openUploadModal()">📄 Upload PDF</button> <button class="reset-btn no-print" onclick="resetFormClick()" type="button">🗑 Reset / Clear Form</button> <button class="print-btn no-print" id="print-form-btn" onclick="validateAndPrint()">Print Form</button> <span class="no-print" id="auth-user-email"></span><button class="change-pw-btn no-print" id="btn-change-password" type="button">Change Password</button><button class="logout-btn no-print" id="btn-logout" type="button">Log out</button></div>
     
     <div class="page-scale-wrapper">
     <div class="page-container">

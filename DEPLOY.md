@@ -57,6 +57,13 @@ supabase/schema.sql             <- run once in Supabase to set up the database
    - **Project URL**
    - **anon public** key (or the newer **Publishable key**, `sb_publishable_...`
      — either works the same way here)
+6. **Only if you want the "Email code" sign-in option to work:** by default
+   Supabase's "Magic Link" email template sends a clickable link, not a
+   6-digit code. Go to **Authentication → Email Templates → Magic Link** and
+   make sure the template includes `{{ .Token }}` somewhere (e.g. add a line
+   like `Your login code is: {{ .Token }}`). Without this, users who choose
+   "Email code" on the sign-in page will receive an email with a link
+   instead of the code the page asks them to type in.
 
 ## Part 2 — Add your users and assign roles
 
