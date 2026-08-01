@@ -24,6 +24,7 @@
         border-radius: 8px;
         box-shadow: 0 2px 12px rgba(0,0,0,0.12);
         box-sizing: border-box;
+        text-align: center;
     }
     #login-card img {
         display: block;
@@ -36,25 +37,9 @@
         margin: 0 0 22px 0;
         color: #222;
     }
-    label {
-        display: block;
-        font-size: 13px;
-        font-weight: bold;
-        margin-bottom: 4px;
-        color: #333;
-    }
-    input[type="email"], input[type="password"] {
-        width: 100%;
-        padding: 9px 10px;
-        margin-bottom: 16px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 14px;
-        box-sizing: border-box;
-    }
     button#btn-signin {
         width: 100%;
-        padding: 10px;
+        padding: 11px;
         background: #0d6efd;
         color: #fff;
         border: none;
@@ -62,6 +47,10 @@
         font-size: 14px;
         font-weight: bold;
         cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
     }
     button#btn-signin:disabled {
         background: #93bdfb;
@@ -86,28 +75,27 @@
     <img src="nglogo.jpg" alt="Company logo">
     <h1>ENGINEERS QUALIFICATION BOARD<br>Sign In</h1>
 
-    <form id="loginForm" autocomplete="off">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" required autocomplete="username">
-
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required autocomplete="current-password">
-
-        <button type="submit" id="btn-signin">Sign In</button>
-    </form>
+    <button type="button" id="btn-signin">
+        <svg width="18" height="18" viewBox="0 0 21 21" aria-hidden="true">
+            <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
+            <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
+            <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
+            <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+        </svg>
+        Sign in with Microsoft
+    </button>
 
     <div id="status-msg"></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="assets/js/supabase-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3/lib/msal-browser.min.js"></script>
+<script src="assets/js/msal-config.js"></script>
 <script>
 (function () {
     "use strict";
 
-    var client = window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY);
+    var msalInstance = new msal.PublicClientApplication(window.MSAL_CONFIG);
     var statusEl = document.getElementById("status-msg");
-    var form = document.getElementById("loginForm");
     var signinBtn = document.getElementById("btn-signin");
 
     function pageForRole(role) {
@@ -121,76 +109,64 @@
         statusEl.className = type || "";
     }
 
-    async function redirectIfAlreadySignedIn() {
-        var sessionResult = await client.auth.getSession();
-        var session = sessionResult && sessionResult.data ? sessionResult.data.session : null;
+    function getRoleFromAccount(account) {
+        var claims = account && account.idTokenClaims;
+        var roles = claims && claims.roles;
+        return (roles && roles.length) ? roles[0] : null;
+    }
 
-        if (!session) {
+    async function init() {
+        await msalInstance.initialize();
+
+        var redirectResult = await msalInstance.handleRedirectPromise().catch(function (err) {
+            console.error("[login] redirect handling error:", err);
+            showMessage("Sign in failed: " + err.message, "error");
+            return null;
+        });
+
+        var params = new URLSearchParams(window.location.search);
+        var reason = params.get("reason");
+        if (reason === "no_access") {
+            showMessage("Your account does not have access assigned yet. Contact the site administrator.", "error");
+        } else if (reason === "signin_required") {
+            showMessage("Please sign in to continue.", "info");
+        }
+
+        var accounts = msalInstance.getAllAccounts();
+
+        if (redirectResult && redirectResult.account) {
+            accounts = [redirectResult.account];
+        }
+
+        if (!accounts.length) {
             document.documentElement.classList.remove("auth-checking");
             return;
         }
 
-        var profileResult = await client
-            .from("profiles")
-            .select("role")
-            .eq("id", session.user.id)
-            .single();
+        var account = accounts[0];
+        msalInstance.setActiveAccount(account);
 
-        var target = profileResult.data ? pageForRole(profileResult.data.role) : null;
+        var role = getRoleFromAccount(account);
+        var target = pageForRole(role);
 
         if (target) {
             window.location.replace(target);
         } else {
-            // Session exists but no role assigned yet - sign out and let them try again.
-            await client.auth.signOut();
-            document.documentElement.classList.remove("auth-checking");
-        }
-    }
-
-    var params = new URLSearchParams(window.location.search);
-    var reason = params.get("reason");
-    if (reason === "no_access") {
-        showMessage("Your account does not have access assigned yet. Contact the site administrator.", "error");
-    } else if (reason === "signin_required") {
-        showMessage("Please sign in to continue.", "info");
-    }
-
-    redirectIfAlreadySignedIn();
-
-    form.addEventListener("submit", async function (event) {
-        event.preventDefault();
-        signinBtn.disabled = true;
-        showMessage("Signing in...", "info");
-
-        var email = document.getElementById("email").value.trim();
-        var password = document.getElementById("password").value;
-
-        var signInResult = await client.auth.signInWithPassword({ email: email, password: password });
-
-        if (signInResult.error) {
-            showMessage("Sign in failed: " + signInResult.error.message, "error");
-            signinBtn.disabled = false;
-            return;
-        }
-
-        var userId = signInResult.data.user.id;
-
-        var profileResult = await client
-            .from("profiles")
-            .select("role")
-            .eq("id", userId)
-            .single();
-
-        var target = profileResult.data ? pageForRole(profileResult.data.role) : null;
-
-        if (!target) {
+            // Signed in, but no app role assigned yet.
             showMessage("Your account does not have access assigned yet. Contact the site administrator.", "error");
-            await client.auth.signOut();
-            signinBtn.disabled = false;
-            return;
+            await msalInstance.logoutRedirect({ account: account, postLogoutRedirectUri: window.MSAL_CONFIG.postLogoutRedirectUri });
         }
+    }
 
-        window.location.replace(target);
+    init();
+
+    signinBtn.addEventListener("click", function () {
+        signinBtn.disabled = true;
+        showMessage("Redirecting to Microsoft sign-in...", "info");
+        msalInstance.loginRedirect({ scopes: window.MSAL_LOGIN_SCOPES }).catch(function (err) {
+            showMessage("Sign in failed: " + err.message, "error");
+            signinBtn.disabled = false;
+        });
     });
 })();
 </script>
