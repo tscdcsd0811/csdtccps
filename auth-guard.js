@@ -134,13 +134,25 @@
         var logoutBtn = document.getElementById("btn-logout");
         if (logoutBtn) {
             logoutBtn.addEventListener("click", function () {
-                // logoutRedirect both clears this browser's local session AND
-                // ends the session with Microsoft's own login page, so the
-                // next "Sign in" click truly re-prompts instead of silently
-                // reusing a leftover session — important on shared computers.
                 msalInstance.logoutRedirect({
                     account: account,
-                    postLogoutRedirectUri: window.MSAL_CONFIG.postLogoutRedirectUri
+                    // onRedirectNavigate returning false stops MSAL from
+                    // actually navigating the browser to Microsoft's own
+                    // sign-out page. MSAL still fully clears THIS APP's
+                    // local session before this callback runs (so the next
+                    // person on a shared computer never inherits it) — but
+                    // because we stop the navigation, the person's
+                    // browser-wide Microsoft session (Outlook, Teams,
+                    // SharePoint, or any other Microsoft site open in the
+                    // same browser) is left completely untouched. This is a
+                    // deliberate choice for shared corporate computers,
+                    // where signing someone out of everything Microsoft
+                    // just because they logged out of this one form tool
+                    // would be a disruptive surprise.
+                    onRedirectNavigate: function () {
+                        window.location.replace("index.html");
+                        return false;
+                    }
                 });
             });
         }

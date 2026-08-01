@@ -163,7 +163,16 @@
     signinBtn.addEventListener("click", function () {
         signinBtn.disabled = true;
         showMessage("Redirecting to Microsoft sign-in...", "info");
-        msalInstance.loginRedirect({ scopes: window.MSAL_LOGIN_SCOPES }).catch(function (err) {
+        msalInstance.loginRedirect({
+            scopes: window.MSAL_LOGIN_SCOPES,
+            // "login" forces Microsoft's page to require a full sign-in every
+            // time, instead of silently reusing a browser-wide Microsoft SSO
+            // session (which is what produces the fast "pick an account"
+            // shortcut right after logging out — the browser can still be
+            // signed into Microsoft generally even though this app's own
+            // session was fully cleared).
+            prompt: "login"
+        }).catch(function (err) {
             showMessage("Sign in failed: " + err.message, "error");
             signinBtn.disabled = false;
         });

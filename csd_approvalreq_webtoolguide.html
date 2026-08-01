@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="auth-checking">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CSD T&C CONTRACTOR ENGINEER'S QUALIFICATION APPROVAL REQUEST TOOL</title>
     <style>
+        html.auth-checking .container { visibility: hidden; }
         body { font-family: Arial, sans-serif; line-height: 1.6; margin: 40px; max-width: 900px; color: #333; }
         h1 { color: #0056b3; font-size: 24px; text-align: center; }
         h2 { color: #444; border-bottom: 2px solid #0056b3; padding-bottom: 5px; font-size: 20px; margin-top: 30px;}
@@ -60,5 +61,12 @@
             </li>
         </ul>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3/lib/msal-browser.min.js"></script>
+    <script src="assets/js/msal-config.js"></script>
+    <!-- No window.REQUIRED_ROLE set here on purpose: this guide is shared by
+         both internal and external users, so auth-guard.js only checks that
+         *some* role is assigned, not which one. -->
+    <script src="assets/js/auth-guard.js"></script>
 </body>
 </html>
