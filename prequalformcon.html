@@ -508,7 +508,6 @@
     <div class="top-container">
         <div class="top-user-bar">
             <span id="auth-user-email" class="user-email"></span>
-            <button type="button" id="btn-change-password" class="btn-link btn-link-password">Change Password</button>
             <button type="button" id="btn-logout" class="btn-link btn-link-logout">Log out</button>
         </div>
         <div class="header-panel">
@@ -1107,8 +1106,11 @@
     }
 
     // Company Name is no longer picked from a dropdown: it's auto-filled from
-    // the signed-in user's own profile (companyid/companyname columns), in
-    // the same "companyid - companyname" format the dropdown used to produce.
+    // the signed-in user's own profile. The visible field shows ONLY the
+    // company name — the employee/company ID is intentionally not displayed
+    // here, it's kept in a hidden dataset attribute purely so the existing
+    // filename-generation code elsewhere on this page still has something to
+    // use (falls back to "nocompanyid" if it's ever blank).
     // auth-guard.js exposes this as window.authProfile once it's loaded, and
     // fires an "auth-ready" event on document for the case where auth-guard
     // finishes loading it after this page's own DOMContentLoaded handler runs.
@@ -1129,8 +1131,7 @@
             return;
         }
 
-        const concatenatedVal = (authProfile.companyid || '') + ' - ' + authProfile.companyname;
-        companyEl.value = concatenatedVal;
+        companyEl.value = authProfile.companyname;
         companyEl.dataset.companyId = authProfile.companyid || '';
         saveFormState();
     }
