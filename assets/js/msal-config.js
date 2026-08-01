@@ -19,8 +19,8 @@
  */
 window.MSAL_CONFIG = {
     auth: {
-        clientId: "PASTE-YOUR-APPLICATION-CLIENT-ID-HERE",
-        authority: "https://login.microsoftonline.com/PASTE-YOUR-TENANT-ID-HERE",
+        clientId: "5ce14b62-c706-4cea-9411-9a0e45696483",
+        authority: "https://login.microsoftonline.com/d2389b64-87bf-49e0-8809-6850628b5823",
         redirectUri: "https://tscdcsd0811.github.io/csdtccps/index.html",
         postLogoutRedirectUri: "https://tscdcsd0811.github.io/csdtccps/index.html",
         navigateToLoginRequestUrl: true
