@@ -76,6 +76,9 @@
         await msalInstance.initialize();
         await msalInstance.handleRedirectPromise().catch(function (err) {
             console.error("[auth-guard] redirect handling error:", err);
+            // Same reasoning as index.html: a lost redirect state is a
+            // recoverable hiccup, not a real failure. Just send them back
+            // to sign in again with a friendly explanation.
         });
 
         var accounts = msalInstance.getAllAccounts();

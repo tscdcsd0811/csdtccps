@@ -16,9 +16,20 @@
         }
 
         .top-container {
-            width: 1770px;
+            width: 100%;
+            max-width: 100%;
             margin-bottom: 20px;
+            box-sizing: border-box;
         }
+
+        .region-request-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .region-request-row select { width: 140px; }
 
         .header-panel {
             text-align: center;
@@ -105,19 +116,17 @@
 
         .master-layout-row {
             display: flex;
-            flex-direction: row;
-            align-items: stretch;
-            gap: 0px;
+            flex-direction: column;
+            gap: 15px;
             width: 100%;
+            max-width: 100%;
         }
 
         .qualifications-layout-wrapper {
             display: flex;
             flex-direction: column;
-            width: 1375px; 
-            flex-shrink: 0;
-            align-self: stretch;
-            justify-content: flex-start;
+            width: 100%;
+            max-width: 100%;
             gap: 12px;
         }
 
@@ -151,9 +160,9 @@
         }
 
         .profile-table {
-            width: 380px; 
-            flex-shrink: 0;
-            height: 100%;
+            width: 100%;
+            max-width: 100%;
+            table-layout: fixed;
         }
         
         .profile-table th {
@@ -341,7 +350,23 @@
             flex-direction: row;
             align-items: flex-start;
             width: 100%;
+            max-width: 100%;
         }
+        .qual-table {
+            table-layout: fixed;
+            min-width: 0;
+            font-size: 11px;
+        }
+        .qual-table td, .qual-table th {
+            height: auto;
+            min-height: 32px;
+            white-space: normal;
+            word-break: break-word;
+        }
+        .qual-tables-row > .qual-table-1 { flex: 18 0 0; }
+        .qual-tables-row > .qual-table-2 { flex: 26 0 0; }
+        .qual-tables-row > .qual-table-3 { flex: 28 0 0; }
+        .qual-tables-row > .qual-table-4 { flex: 28 0 0; }
 
         .btn {
             padding: 10px 20px;
@@ -572,6 +597,16 @@
                 <a href="csd_approvalreq_webtoolguide.html" target="_blank" style="font-size: 13px; color: #007bff; text-decoration: underline;">Click this to open the Instructions/Guides in using this web tool</a>
             </div>
             <div id="header-company-subtitle" class="header-company-subtitle">Company name</div>
+            <div class="region-request-row">
+                <label for="global_region" style="font-weight: bold;">Requesting for Region</label>
+                <select id="global_region" class="yellow-cell" style="height: 32px; border: 1px solid #ccc; font-size: 14px;" onchange="saveFormState()">
+                    <option value=""></option>
+                    <option value="COA">COA</option>
+                    <option value="EOA">EOA</option>
+                    <option value="SOA">SOA</option>
+                    <option value="WOA">WOA</option>
+                </select>
+            </div>
             <div class="header-actions">
                 <button type="button" id="btn-add-engineer" class="btn btn-add" onclick="addNewEngineer()">Add Another Engineer</button>
                 <button type="button" id="btn-reset-form" class="btn btn-reset" onclick="confirmResetForm()">Clear & Reset Form</button>
@@ -593,16 +628,6 @@
                 <label style="font-weight: bold; white-space: nowrap;">Company Name</label>
                 <input type="text" id="global_company" class="company-select yellow-cell readonly-field" style="width: 100%; height: 32px; border: 1px solid #ccc; font-size: 14px;" value="" placeholder="Loading your company..." readonly>
             </div>
-            <div style="display: flex; align-items: center; gap: 10px; width: 300px;">
-                <label style="font-weight: bold; white-space: nowrap;">Region</label>
-                <select id="global_region" class="yellow-cell" style="width: 100%; height: 32px; border: 1px solid #ccc; font-size: 14px;" onchange="saveFormState()">
-                    <option value=""></option>
-                    <option value="COA">COA</option>
-                    <option value="EOA">EOA</option>
-                    <option value="SOA">SOA</option>
-                    <option value="WOA">WOA</option>
-                </select>
-            </div>
         </div>
     </div>
     
@@ -615,10 +640,29 @@
         <button type="button" class="btn-remove-record" onclick="removeEngineerRecord(this)">Remove</button>
         <div class="master-layout-row">
             <table class="profile-table">
+                <colgroup>
+                    <col style="width: 9%;">
+                    <col style="width: 41%;">
+                    <col style="width: 8%;">
+                    <col style="width: 15%;">
+                    <col style="width: 12%;">
+                    <col style="width: 15%;">
+                </colgroup>
                 <tbody>
                     <tr>
                         <td class="profile-label">Engineer's Name <span style="color: #d32f2f;">(as per IQAMA/ID)</span></td>
                         <td class="yellow-cell"><textarea name="profile_name[]" class="name-textarea" rows="2" oninput="saveFormState()"></textarea></td>
+                        <td class="profile-label">Iqama/ID</td>
+                        <td class="yellow-cell"><input type="text" name="profile_identity[]" inputmode="numeric" maxlength="10" placeholder="10 Digits" oninput="enforceNumericLimit(this, 10); saveFormState()"></td>
+                        <td class="profile-label">Total Experience</td>
+                        <td class="yellow-cell" style="padding:0;">
+                            <div class="exp-split-container">
+                                <input type="text" name="profile_total_exp_yrs[]" placeholder="0" oninput="this.value = this.value.replace(/\D/g, ''); saveFormState()">
+                                <span>Yrs</span>
+                                <input type="text" name="profile_total_exp_mos[]" inputmode="numeric" maxlength="2" placeholder="0" oninput="enforceMonthsLimit(this); saveFormState()">
+                                <span>Mos</span>
+                            </div>
+                        </td>
                     </tr>
                     <tr>
                         <td class="profile-label">Nationality</td>
@@ -694,23 +738,8 @@
                                 <option value="Zimbabwean">Zimbabwean</option>
                             </select>
                         </td>
-                    </tr>
-                    <tr>
-                        <td class="profile-label">Iqama/ID</td>
-                        <td class="yellow-cell"><input type="text" name="profile_identity[]" inputmode="numeric" maxlength="10" placeholder="10 Digits" oninput="enforceNumericLimit(this, 10); saveFormState()"></td>
-                    </tr>
-                    <tr>
-                        <td class="profile-label">Total Experience</td>
-                        <td class="yellow-cell" style="padding:0;">
-                            <div class="exp-split-container">
-                                <input type="text" name="profile_total_exp_yrs[]" placeholder="0" oninput="this.value = this.value.replace(/\D/g, ''); saveFormState()">
-                                <span>Yrs</span>
-                                <input type="text" name="profile_total_exp_mos[]" inputmode="numeric" maxlength="2" placeholder="0" oninput="enforceMonthsLimit(this); saveFormState()">
-                                <span>Mos</span>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
+                        <td class="profile-label">Contact No</td>
+                        <td class="yellow-cell"><input type="text" name="profile_contact[]" inputmode="numeric" maxlength="10" placeholder="10 Digits" oninput="enforceNumericLimit(this, 10); saveFormState()"></td>
                         <td class="profile-label">Experience in KSA</td>
                         <td class="yellow-cell" style="padding:0;">
                             <div class="exp-split-container">
@@ -718,29 +747,6 @@
                                 <span>Yrs</span>
                                 <input type="text" name="profile_ksa_exp_mos[]" inputmode="numeric" maxlength="2" placeholder="0" oninput="enforceMonthsLimit(this); saveFormState()">
                                 <span>Mos</span>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="profile-label">Contact No</td>
-                        <td class="yellow-cell"><input type="text" name="profile_contact[]" inputmode="numeric" maxlength="10" placeholder="10 Digits" oninput="enforceNumericLimit(this, 10); saveFormState()"></td>
-                    </tr>
-                    <tr>
-                        <td class="profile-label">Status</td>
-                        <td class="yellow-cell">
-                            <select name="profile_status[]" onchange="saveFormState()">
-                                <option value=""></option>
-                                <option value="New">New</option>
-                                <option value="Upgrade">Upgrade</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr title="Please make sure the file you will be uploading here is a merged file of the following IN SEQUENCE and should be ONLY 1.3mb or less:&#10;&#10;1) Previous Approval Form(if available). IMPORTANT!!!: INCLUDE PREVIOUSLY DOWNGRADED APPROVAL IF ENGINEER WAS PREVIOUSLY DOWNGRADED.&#10;2) Iqama or ID&#10;3) Muqeem Information&#10;4) Engineer's CV(should be stamped, updated and brief)&#10;5) PD Certificate from the PD measuring unit manufacturer(see PD certificate conditions)&#10;6) Engineering Accreditation certifications from Saudi council of Engineers(the specialization must be shown) + barcode&#10;7) GOSI(showing your company's name as an employer - for Saudis only)+barcode.">
-                        <td class="profile-label">Credentials Attachment</td>
-                        <td class="yellow-cell">
-                            <div class="file-wrapper">
-                                <input type="file" name="profile_credentials[]" accept=".pdf" onclick="triggerSequenceVerificationPrompt(event)" onchange="handleFileChange(this); saveFormState();">
-                                <span class="upload-badge">✓ Attached</span>
                             </div>
                         </td>
                     </tr>
@@ -754,8 +760,8 @@
                     <table class="qual-table qual-table-1">
                         <thead>
                             <tr>
-                                <th style="width: 170px;"></th>
-                                <th style="width: 85px;">No Voltage<br>Level</th>
+                                <th style="width: 65%;"></th>
+                                <th style="width: 35%;">No Voltage<br>Level</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -791,10 +797,10 @@
                     <table class="qual-table qual-table-2">
                         <thead>
                             <tr>
-                                <th style="width: 180px;"></th>
-                                <th style="width: 65px;">MV</th>
-                                <th style="width: 65px;">HV</th>
-                                <th style="width: 65px;">EHV</th>
+                                <th style="width: 48%;"></th>
+                                <th style="width: 17%;">MV</th>
+                                <th style="width: 17%;">HV</th>
+                                <th style="width: 18%;">EHV</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -842,10 +848,10 @@
                     <table class="qual-table qual-table-3">
                         <thead>
                             <tr>
-                                <th style="width: 210px;"></th>
-                                <th style="width: 65px;">MV</th>
-                                <th style="width: 65px;">HV</th>
-                                <th style="width: 65px;">EHV</th>
+                                <th style="width: 52%;"></th>
+                                <th style="width: 16%;">MV</th>
+                                <th style="width: 16%;">HV</th>
+                                <th style="width: 16%;">EHV</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -893,10 +899,10 @@
                     <table class="qual-table qual-table-4">
                         <thead>
                             <tr>
-                                <th style="width: 210px;"></th>
-                                <th style="width: 65px;">MV</th>
-                                <th style="width: 65px;">HV</th>
-                                <th style="width: 65px;">EHV</th>
+                                <th style="width: 52%;"></th>
+                                <th style="width: 16%;">MV</th>
+                                <th style="width: 16%;">HV</th>
+                                <th style="width: 16%;">EHV</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -942,15 +948,36 @@
 
                 <div class="inline-revisions-container">
                     <table class="meta-fields-table">
+                        <colgroup>
+                            <col style="width: 12%;">
+                            <col style="width: 38%;">
+                            <col style="width: 16%;">
+                            <col style="width: 34%;">
+                        </colgroup>
                         <tbody>
                             <tr>
-                                <td class="profile-label" style="width: 170px; text-align: center;">Location</td>
+                                <td class="profile-label" style="text-align: center;">Location</td>
                                 <td class="yellow-cell">
                                     <input type="text" name="profile_location[]" oninput="saveFormState()">
                                 </td>
+                                <td class="profile-label" style="text-align: center;" title="Please make sure the file you will be uploading here is a merged file of the following IN SEQUENCE and should be ONLY 1.3mb or less:&#10;&#10;1) Previous Approval Form(if available). IMPORTANT!!!: INCLUDE PREVIOUSLY DOWNGRADED APPROVAL IF ENGINEER WAS PREVIOUSLY DOWNGRADED.&#10;2) Iqama or ID&#10;3) Muqeem Information&#10;4) Engineer's CV(should be stamped, updated and brief)&#10;5) PD Certificate from the PD measuring unit manufacturer(see PD certificate conditions)&#10;6) Engineering Accreditation certifications from Saudi council of Engineers(the specialization must be shown) + barcode&#10;7) GOSI(showing your company's name as an employer - for Saudis only)+barcode.">Credentials Attachment</td>
+                                <td class="yellow-cell">
+                                    <div class="file-wrapper">
+                                        <input type="file" name="profile_credentials[]" accept=".pdf" onclick="triggerSequenceVerificationPrompt(event)" onchange="handleFileChange(this); saveFormState();">
+                                        <span class="upload-badge">✓ Attached</span>
+                                    </div>
+                                </td>
                             </tr>
                             <tr>
-                                <td class="profile-label" style="width: 170px; text-align: center;">Remarks</td>
+                                <td class="profile-label" style="text-align: center;">Status</td>
+                                <td class="yellow-cell">
+                                    <select name="profile_status[]" onchange="saveFormState()">
+                                        <option value=""></option>
+                                        <option value="New">New</option>
+                                        <option value="Upgrade">Upgrade</option>
+                                    </select>
+                                </td>
+                                <td class="profile-label" style="text-align: center;">Remarks</td>
                                 <td class="yellow-cell">
                                     <input type="text" name="profile_remarks[]" oninput="saveFormState()">
                                 </td>
