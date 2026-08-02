@@ -94,12 +94,32 @@
         overflow: hidden;
         min-height: 640px;
     }
-    .docs-embed-wrapper iframe {
-        width: 100%;
-        height: 640px;
-        border: none;
-        display: block;
+    .docs-open-card {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8f9fa;
+        text-align: center;
+        padding: 40px;
     }
+    .docs-open-card-inner { max-width: 360px; }
+    .docs-open-card-inner p {
+        font-size: 14px;
+        color: #555;
+        margin: 0 0 20px;
+        line-height: 1.5;
+    }
+    .docs-open-btn {
+        display: inline-block;
+        background: #0d6efd;
+        color: #fff;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 14px;
+        padding: 12px 22px;
+        border-radius: 6px;
+    }
+    .docs-open-btn:hover { background: #0b5ed7; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3/lib/msal-browser.min.js"></script>
 <script src="assets/js/msal-config.js"></script>
@@ -147,23 +167,17 @@
                 </ul>
             </div>
 
-            <div class="docs-embed-wrapper">
-                <!--
-                    This loads your OneDrive folder's live file listing
-                    directly — real file names and real "Last Modified"
-                    dates, automatically up to date, no code involved.
-
-                    For best reliability, replace this src with OneDrive's
-                    dedicated EMBED link rather than the plain share link:
-                    open the folder on onedrive.live.com -> right-click ->
-                    Embed -> copy the URL out of the generated <iframe> tag
-                    -> paste it here in place of the src below.
-                -->
-                <iframe
-                    src="https://1drv.ms/f/c/9c4e6640b2f178ee/IgC4WRAlX58ESbdbD8CUfK8GAbRr3YYKpJI--VasLsMPKEQ?e=aILPJy"
-                    title="CSD Approved Documents (OneDrive)"
-                    allowfullscreen>
-                </iframe>
+            <div class="docs-embed-wrapper docs-open-card">
+                <div class="docs-open-card-inner">
+                    <p>
+                        The approved documents folder opens in a new tab —
+                        OneDrive's own file browser, always up to date.
+                    </p>
+                    <a href="https://1drv.ms/f/c/9c4e6640b2f178ee/IgC4WRAlX58ESbdbD8CUfK8GAbRr3YYKpJI--VasLsMPKEQ?e=aILPJy"
+                       target="_blank" rel="noopener" class="docs-open-btn">
+                        Open CSD Approved Documents Folder &#8599;
+                    </a>
+                </div>
             </div>
         </div>
 
