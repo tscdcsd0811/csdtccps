@@ -76,6 +76,9 @@
         await msalInstance.initialize();
         await msalInstance.handleRedirectPromise().catch(function (err) {
             console.error("[auth-guard] redirect handling error:", err);
+            // Same reasoning as index.html: a lost redirect state is a
+            // recoverable hiccup, not a real failure. Just send them back
+            // to sign in again with a friendly explanation.
         });
 
         var accounts = msalInstance.getAllAccounts();
@@ -134,20 +137,35 @@
         var logoutBtn = document.getElementById("btn-logout");
         if (logoutBtn) {
             logoutBtn.addEventListener("click", function () {
-                msalInstance.logoutRedirect({ account: account });
+                msalInstance.logoutRedirect({
+                    account: account,
+                    // onRedirectNavigate returning false stops MSAL from
+                    // actually navigating the browser to Microsoft's own
+                    // sign-out page. MSAL still fully clears THIS APP's
+                    // local session before this callback runs (so the next
+                    // person on a shared computer never inherits it) — but
+                    // because we stop the navigation, the person's
+                    // browser-wide Microsoft session (Outlook, Teams,
+                    // SharePoint, or any other Microsoft site open in the
+                    // same browser) is left completely untouched. This is a
+                    // deliberate choice for shared corporate computers,
+                    // where signing someone out of everything Microsoft
+                    // just because they logged out of this one form tool
+                    // would be a disruptive surprise.
+                    onRedirectNavigate: function () {
+                        window.location.replace("index.html");
+                        return false;
+                    }
+                });
             });
         }
 
-        var changePasswordBtn = document.getElementById("btn-change-password");
-        if (changePasswordBtn) {
-            // Microsoft accounts manage their own password reset/change through
-            // Microsoft's own security portal — there's no equivalent client-side
-            // API call for a static site to do this itself (unlike the old
-            // Supabase updateUser() call), so this just opens Microsoft's page.
-            changePasswordBtn.addEventListener("click", function () {
-                window.open("https://mysignins.microsoft.com/security-info", "_blank", "noopener");
-            });
-        }
+        // Note: there is intentionally no "change password" feature here.
+        // Under Entra ID, this app never sees, stores, or handles a
+        // password at all — sign-in happens entirely on Microsoft's own
+        // login page, and many external/guest users authenticate via a
+        // one-time email code with no password involved whatsoever. A
+        // "change password" button has nothing meaningful left to do.
     }
 
     guard();

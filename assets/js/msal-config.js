@@ -26,7 +26,15 @@ window.MSAL_CONFIG = {
         navigateToLoginRequestUrl: true
     },
     cache: {
-        cacheLocation: "localStorage",
+        // sessionStorage (not localStorage) is deliberate: it's scoped to a
+        // single browser tab/window and is automatically wiped the moment
+        // that tab or window closes. On a shared/kiosk-style computer, this
+        // guarantees the next person who opens the site never inherits a
+        // previous person's signed-in session, even if they forgot to click
+        // "Log out". The tradeoff is that each new browser window requires
+        // signing in again, even on a personal device — the right tradeoff
+        // for a tool used on shared computers.
+        cacheLocation: "sessionStorage",
         storeAuthStateInCookie: false
     }
 };

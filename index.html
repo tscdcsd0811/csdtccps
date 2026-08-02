@@ -120,7 +120,13 @@
 
         var redirectResult = await msalInstance.handleRedirectPromise().catch(function (err) {
             console.error("[login] redirect handling error:", err);
-            showMessage("Sign in failed: " + err.message, "error");
+            // A lost redirect state (e.g. "no_cached_authority_error") can
+            // happen occasionally depending on the browser/device — the
+            // sign-in itself didn't fail, the browser just didn't hold onto
+            // where it was mid-flow. This is recoverable: just let the
+            // person try again, framed as a normal hiccup rather than a
+            // technical failure.
+            showMessage("That sign-in attempt didn't complete. Please click \u201cSign in with Microsoft\u201d again.", "error");
             return null;
         });
 
