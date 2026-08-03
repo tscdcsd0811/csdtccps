@@ -7,10 +7,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Engineers Qualification Board</title>
+    <link rel="stylesheet" href="assets/css/navbar.css">
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
             background-color: #ffffff;
             color: #000000;
         }
@@ -326,7 +327,7 @@
             text-align: center;
             padding: 0; 
             transition: background-color 0.15s ease;
-            min-height: 61px;
+            min-height: 122px;
         }
         .qual-cell select {
             width: 100%;
@@ -440,81 +441,6 @@
         .btn-submit-pdfs:hover {
             background-color: #138496;
         }
-        .app-shell {
-            display: flex;
-            align-items: flex-start;
-        }
-        .app-sidebar {
-            width: 220px;
-            flex-shrink: 0;
-            background: #0a1f44;
-            min-height: 100vh;
-            padding: 20px 0;
-            box-sizing: border-box;
-        }
-        .app-sidebar .sidebar-logo {
-            padding: 0 18px 24px;
-        }
-        .app-sidebar .sidebar-logo img {
-            max-width: 100%;
-            display: block;
-            background: #fff;
-            border-radius: 4px;
-            padding: 6px;
-        }
-        .app-sidebar nav a {
-            display: block;
-            padding: 10px 18px;
-            font-size: 14px;
-            color: #cfe0ff;
-            text-decoration: underline;
-            line-height: 1.4;
-        }
-        .app-sidebar nav a.active {
-            color: #ffffff;
-            font-weight: bold;
-        }
-        .app-main {
-            flex: 1;
-            min-width: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .top-user-bar {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 14px;
-            padding: 0 0 8px;
-            flex-wrap: wrap;
-        }
-        .top-user-bar .user-email {
-            font-size: 12px;
-            color: #555;
-        }
-        .btn-link {
-            background: none;
-            border: none;
-            padding: 0;
-            font: inherit;
-            font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            text-decoration: underline;
-            box-shadow: none;
-        }
-        .btn-link-password {
-            color: #0056b3;
-        }
-        .btn-link-password:hover {
-            color: #003d80;
-        }
-        .btn-link-logout {
-            color: #dc3545;
-        }
-        .btn-link-logout:hover {
-            color: #a71d2a;
-        }
         .readonly-field {
             background-color: #f0f0f0 !important;
             color: #333;
@@ -605,28 +531,33 @@
             crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3/lib/msal-browser.min.js"></script>
     <script src="assets/js/msal-config.js"></script>
-    <script>window.REQUIRED_ROLE = "external";</script>
+    <script>window.REQUIRED_ROLES = ["external", "admin"];</script>
     <script src="assets/js/auth-guard.js"></script>
+    <script src="assets/js/navbar.js"></script>
 </head>
 <body>
 
 <div class="app-shell">
-    <aside class="app-sidebar">
+    <aside class="app-sidebar no-print">
         <div class="sidebar-logo"><img src="nglogo.jpg" alt="National Grid SA"></div>
         <nav>
-            <a href="prequalformcon.html" class="active">T&amp;C Engineer's Approval Request</a>
-            <a href="csd_approved_documents.html">CSD Approved Documents</a>
+            <a href="prequalformcon.html" data-roles="external,admin">T&amp;C Contractor Engineer's Approval Request</a>
+            <a href="prequalformint.html" data-roles="internal,admin">T&amp;C Internal Engineer's Approval Request</a>
+            <a href="csd_approvalreq_webtoolguide.html" data-roles="external,admin">Contractor Web Tool Guide</a>
+            <a href="csd_approvalint_webtoolguide.html" data-roles="internal,admin">Internal Web Tool Guide</a>
+            <a href="https://1drv.ms/f/c/9c4e6640b2f178ee/IgC4WRAlX58ESbdbD8CUfK8GAbRr3YYKpJI--VasLsMPKEQ?e=aILPJy" target="_blank" rel="noopener" data-roles="external,admin">CSD Approved Documents &#8599;</a>
         </nav>
+        <div class="sidebar-bottom">
+            <span id="auth-user-email" class="user-email"></span>
+            <a href="index.html" id="nav-signin-link" class="btn-link btn-link-signin">Sign in</a>
+            <button type="button" id="btn-logout" class="btn-link btn-link-logout">Log out</button>
+        </div>
     </aside>
     <div class="app-main">
 
 <form id="qualificationsForm" onsubmit="handleFormSubmission(event)" autocomplete="off">
     
     <div class="top-container">
-        <div class="top-user-bar">
-            <span id="auth-user-email" class="user-email"></span>
-            <button type="button" id="btn-logout" class="btn-link btn-link-logout">Log out</button>
-        </div>
         <div class="header-panel">
             <div class="header-title-wrapper">
                 <h2>ENGINEER'S QUALIFICATION APPROVAL REQUEST FORM</h2>
@@ -1216,9 +1147,10 @@
         const subtitleEl = document.getElementById('header-company-subtitle');
         if (!companyEl || !authProfile) return;
 
-        if (authProfile.role !== 'external') {
-            // This page requires the "external" role (see REQUIRED_ROLE above),
-            // so in practice this should never happen, but guard anyway.
+        if (authProfile.role !== 'external' && authProfile.role !== 'admin') {
+            // This page requires the "external" or "admin" role (see
+            // REQUIRED_ROLES above), so in practice this should never
+            // happen, but guard anyway.
             return;
         }
 

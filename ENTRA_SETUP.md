@@ -35,7 +35,7 @@ authority: "https://login.microsoftonline.com/...paste Tenant ID here...",
 
 Commit and push. GitHub Pages will redeploy automatically.
 
-## 3. Define the two app roles (internal / external)
+## 3. Define the app roles (internal / external / admin)
 
 1. In the app registration, go to **App roles** (left sidebar) -> **Create
    app role**.
@@ -46,13 +46,17 @@ Commit and push. GitHub Pages will redeploy automatically.
    - Description: anything
    - Allowed member types: **Users/Groups**
 3. Repeat for a second role with Value `external`.
+4. Repeat for a third role with Value `admin`. Admins can open and use
+   both `prequalformcon.html` and `prequalformint.html`, plus both web
+   tool guides — everything a `internal` or `external` user can see,
+   combined.
 
 ## 4. Assign each user to a role
 
 1. Go to **Identity -> Applications -> Enterprise applications** -> find
    this app (same name as the registration) -> **Users and groups**.
 2. **Add user/group** -> pick a person -> under "Select a role" choose
-   either `Internal` or `External` -> **Assign**.
+   `Internal`, `External`, or `Admin` -> **Assign**.
 3. Repeat for everyone who needs access — this list is exactly the
    equivalent of the old `profiles` table's `role` column.
 
@@ -84,9 +88,19 @@ starts empty — same fallback behavior as before, nothing breaks.
 2. Click **Sign in with Microsoft**.
 3. Sign in with a user you assigned a role to in step 4.
 4. Should land on the correct form (`prequalformint.html` for Internal,
-   `prequalformcon.html` for External) with their name/company pre-filled.
+   `prequalformcon.html` for External or Admin) with their name/company
+   pre-filled. Admins can use the navbar to switch between
+   `prequalformcon.html` and `prequalformint.html` and both web tool
+   guides.
 5. A user with no role assigned should see "Your account does not have
    access assigned yet."
+6. The two web tool guide pages (`csd_approvalreq_webtoolguide.html` and
+   `csd_approvalint_webtoolguide.html`) can be opened by anyone, signed in
+   or not — they no longer require sign-in. If the visitor is signed in,
+   the navbar on those pages still only shows the buttons for their role.
+7. The "CSD Approved Documents" navbar link (visible only to External and
+   Admin users) opens the OneDrive folder directly in a new tab; there is
+   no longer a separate in-app page for it.
 
 ## What changed vs. the Supabase version
 
