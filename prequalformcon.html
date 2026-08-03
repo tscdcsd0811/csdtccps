@@ -164,34 +164,51 @@
             height: 48px; 
         }
 
-        .profile-table {
+        .profile-grid {
+            display: grid;
+            grid-template-columns: auto 1fr auto 1fr auto 1fr;
             width: 100%;
             max-width: 100%;
-            table-layout: fixed;
+            border-top: 1px solid #000;
+            border-left: 1px solid #000;
+            background: #fff;
+            font-size: 12px;
         }
-        
-        .profile-table th {
-            text-align: center;
+        .profile-grid > div {
+            border-right: 1px solid #000;
+            border-bottom: 1px solid #000;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            min-height: 32px;
         }
 
         .profile-label {
             font-weight: bold;
-            width: 45%;
-        }
-
-        .meta-fields-table {
-            width: 100%;
-            table-layout: fixed;
-        }
-
-        .meta-fields-table td {
-            height: 32px;
-        }
-        .meta-fields-table td.profile-label {
             white-space: nowrap;
+            padding: 4px 10px;
+            background: #fff;
         }
 
-        .meta-fields-table input[type="text"] {
+        .meta-fields-grid {
+            display: grid;
+            grid-template-columns: auto 1fr auto 1fr auto 1fr;
+            width: 100%;
+            border-top: 1px solid #000;
+            border-left: 1px solid #000;
+            background: #fff;
+            font-size: 12px;
+        }
+        .meta-fields-grid > div {
+            border-right: 1px solid #000;
+            border-bottom: 1px solid #000;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            min-height: 32px;
+        }
+
+        .meta-fields-grid input[type="text"] {
             width: 100%;
             height: 100%;
             border: none;
@@ -201,7 +218,7 @@
             padding-left: 6px;
         }
 
-        .meta-fields-table select {
+        .meta-fields-grid select {
             width: 100%;
             height: 100%;
             border: none;
@@ -364,7 +381,7 @@
             font-size: 14px;
             font-weight: bold;
             text-transform: uppercase;
-            margin: 4px 0 8px;
+            margin: 0 0 4px;
         }
         .qual-table {
             table-layout: fixed;
@@ -372,12 +389,12 @@
             font-size: 11px;
         }
         .qual-table thead th {
-            height: 40px;
-            min-height: 40px;
+            height: 46px;
+            min-height: 46px;
         }
         .qual-table tbody td, .qual-table tbody th {
             height: auto;
-            min-height: 30px;
+            min-height: 35px;
             white-space: normal;
             word-break: break-word;
         }
@@ -659,121 +676,106 @@
     <div class="engineer-record">
         <button type="button" class="btn-remove-record" onclick="removeEngineerRecord(this)">Remove</button>
         <div class="master-layout-row">
-            <table class="profile-table">
-                <colgroup>
-                    <col style="width: 9%;">
-                    <col style="width: 41%;">
-                    <col style="width: 8%;">
-                    <col style="width: 15%;">
-                    <col style="width: 12%;">
-                    <col style="width: 15%;">
-                </colgroup>
-                <tbody>
-                    <tr>
-                        <td class="profile-label">Engineer's Name <span style="color: #d32f2f;">(as per IQAMA/ID)</span></td>
-                        <td class="yellow-cell"><textarea name="profile_name[]" class="name-textarea" rows="2" oninput="saveFormState()"></textarea></td>
-                        <td class="profile-label">Iqama/ID</td>
-                        <td class="yellow-cell"><input type="text" name="profile_identity[]" inputmode="numeric" maxlength="10" placeholder="10 Digits" oninput="enforceNumericLimit(this, 10); saveFormState()"></td>
-                        <td class="profile-label">Total Experience</td>
-                        <td class="yellow-cell" style="padding:0;">
-                            <div class="exp-split-container">
-                                <input type="text" name="profile_total_exp_yrs[]" placeholder="0" oninput="this.value = this.value.replace(/\D/g, ''); saveFormState()">
-                                <span>Yrs</span>
-                                <input type="text" name="profile_total_exp_mos[]" inputmode="numeric" maxlength="2" placeholder="0" oninput="enforceMonthsLimit(this); saveFormState()">
-                                <span>Mos</span>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="profile-label">Nationality</td>
-                        <td class="yellow-cell">
-                            <select name="profile_nationality[]" onchange="saveFormState()">
-                                <option value=""></option>
-                                <option value="Afghan">Afghan</option>
-                                <option value="Albanian">Albanian</option>
-                                <option value="Algerian">Algerian</option>
-                                <option value="American">American</option>
-                                <option value="Australian">Australian</option>
-                                <option value="Austrian">Austrian</option>
-                                <option value="Bahraini">Bahraini</option>
-                                <option value="Bangladeshi">Bangladeshi</option>
-                                <option value="Belgian">Belgian</option>
-                                <option value="Brazilian">Brazilian</option>
-                                <option value="British">British</option>
-                                <option value="Bulgarian">Bulgarian</option>
-                                <option value="Canadian">Canadian</option>
-                                <option value="Chinese">Chinese</option>
-                                <option value="Colombian">Colombian</option>
-                                <option value="Croatian">Croatian</option>
-                                <option value="Czech">Czech</option>
-                                <option value="Danish">Danish</option>
-                                <option value="Dutch">Dutch</option>
-                                <option value="Egyptian">Egyptian</option>
-                                <option value="Emirati">Emirati</option>
-                                <option value="Filipino">Filipino</option>
-                                <option value="Finnish">Finnish</option>
-                                <option value="French">French</option>
-                                <option value="German">German</option>
-                                <option value="Greek">Greek</option>
-                                <option value="Hungarian">Hungarian</option>
-                                <option value="Indian">Indian</option>
-                                <option value="Indonesian">Indonesian</option>
-                                <option value="Irish">Irish</option>
-                                <option value="Italian">Italian</option>
-                                <option value="Japanese">Japanese</option>
-                                <option value="Jordanian">Jordanian</option>
-                                <option value="Kenyan">Kenyan</option>
-                                <option value="Kuwaiti">Kuwaiti</option>
-                                <option value="Lebanese">Lebanese</option>
-                                <option value="Malaysian">Malaysian</option>
-                                <option value="Mexican">Mexican</option>
-                                <option value="Moroccan">Moroccan</option>
-                                <option value="New Zealander">New Zealander</option>
-                                <option value="Nigerian">Nigerian</option>
-                                <option value="Norwegian">Norwegian</option>
-                                <option value="Omani">Omani</option>
-                                <option value="Pakistani">Pakistani</option>
-                                <option value="Polish">Polish</option>
-                                <option value="Portuguese">Portuguese</option>
-                                <option value="Qatari">Qatari</option>
-                                <option value="Romanian">Romanian</option>
-                                <option value="Russian">Russian</option>
-                                <option value="Saudi">Saudi</option>
-                                <option value="South African">South African</option>
-                                <option value="South Korean">South Korean</option>
-                                <option value="Spanish">Spanish</option>
-                                <option value="Sri Lankan">Sri Lankan</option>
-                                <option value="Sudanese">Sudanese</option>
-                                <option value="Swedish">Swedish</option>
-                                <option value="Swiss">Swiss</option>
-                                <option value="Syrian">Syrian</option>
-                                <option value="Taiwanese">Taiwanese</option>
-                                <option value="Thai">Thai</option>
-                                <option value="Tunisian">Tunisian</option>
-                                <option value="Turkish">Turkish</option>
-                                <option value="Ukrainian">Ukrainian</option>
-                                <option value="Venezuelan">Venezuelan</option>
-                                <option value="Vietnamese">Vietnamese</option>
-                                <option value="Yemeni">Yemeni</option>
-                                <option value="Zimbabwean">Zimbabwean</option>
-                            </select>
-                        </td>
-                        <td class="profile-label">Contact No</td>
-                        <td class="yellow-cell"><input type="text" name="profile_contact[]" inputmode="numeric" maxlength="10" placeholder="10 Digits" oninput="enforceNumericLimit(this, 10); saveFormState()"></td>
-                        <td class="profile-label">Experience in KSA</td>
-                        <td class="yellow-cell" style="padding:0;">
-                            <div class="exp-split-container">
-                                <input type="text" name="profile_ksa_exp_yrs[]" placeholder="0" oninput="this.value = this.value.replace(/\D/g, ''); saveFormState()">
-                                <span>Yrs</span>
-                                <input type="text" name="profile_ksa_exp_mos[]" inputmode="numeric" maxlength="2" placeholder="0" oninput="enforceMonthsLimit(this); saveFormState()">
-                                <span>Mos</span>
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="profile-grid">
+                <div class="profile-label">Engineer's Name<br><span style="color: #d32f2f;">(as per IQAMA/ID)</span></div>
+                <div class="yellow-cell"><textarea name="profile_name[]" class="name-textarea" rows="2" oninput="saveFormState()"></textarea></div>
+                <div class="profile-label">Iqama/ID</div>
+                <div class="yellow-cell"><input type="text" name="profile_identity[]" inputmode="numeric" maxlength="10" placeholder="10 Digits" oninput="enforceNumericLimit(this, 10); saveFormState()"></div>
+                <div class="profile-label">Total Experience</div>
+                <div class="yellow-cell" style="padding:0;">
+                    <div class="exp-split-container">
+                        <input type="text" name="profile_total_exp_yrs[]" placeholder="0" oninput="this.value = this.value.replace(/\D/g, ''); saveFormState()">
+                        <span>Yrs</span>
+                        <input type="text" name="profile_total_exp_mos[]" inputmode="numeric" maxlength="2" placeholder="0" oninput="enforceMonthsLimit(this); saveFormState()">
+                        <span>Mos</span>
+                    </div>
+                </div>
 
-            <div class="table-gap"></div>
+                <div class="profile-label">Nationality</div>
+                <div class="yellow-cell">
+                    <select name="profile_nationality[]" onchange="saveFormState()">
+                        <option value=""></option>
+                        <option value="Afghan">Afghan</option>
+                        <option value="Albanian">Albanian</option>
+                        <option value="Algerian">Algerian</option>
+                        <option value="American">American</option>
+                        <option value="Australian">Australian</option>
+                        <option value="Austrian">Austrian</option>
+                        <option value="Bahraini">Bahraini</option>
+                        <option value="Bangladeshi">Bangladeshi</option>
+                        <option value="Belgian">Belgian</option>
+                        <option value="Brazilian">Brazilian</option>
+                        <option value="British">British</option>
+                        <option value="Bulgarian">Bulgarian</option>
+                        <option value="Canadian">Canadian</option>
+                        <option value="Chinese">Chinese</option>
+                        <option value="Colombian">Colombian</option>
+                        <option value="Croatian">Croatian</option>
+                        <option value="Czech">Czech</option>
+                        <option value="Danish">Danish</option>
+                        <option value="Dutch">Dutch</option>
+                        <option value="Egyptian">Egyptian</option>
+                        <option value="Emirati">Emirati</option>
+                        <option value="Filipino">Filipino</option>
+                        <option value="Finnish">Finnish</option>
+                        <option value="French">French</option>
+                        <option value="German">German</option>
+                        <option value="Greek">Greek</option>
+                        <option value="Hungarian">Hungarian</option>
+                        <option value="Indian">Indian</option>
+                        <option value="Indonesian">Indonesian</option>
+                        <option value="Irish">Irish</option>
+                        <option value="Italian">Italian</option>
+                        <option value="Japanese">Japanese</option>
+                        <option value="Jordanian">Jordanian</option>
+                        <option value="Kenyan">Kenyan</option>
+                        <option value="Kuwaiti">Kuwaiti</option>
+                        <option value="Lebanese">Lebanese</option>
+                        <option value="Malaysian">Malaysian</option>
+                        <option value="Mexican">Mexican</option>
+                        <option value="Moroccan">Moroccan</option>
+                        <option value="New Zealander">New Zealander</option>
+                        <option value="Nigerian">Nigerian</option>
+                        <option value="Norwegian">Norwegian</option>
+                        <option value="Omani">Omani</option>
+                        <option value="Pakistani">Pakistani</option>
+                        <option value="Polish">Polish</option>
+                        <option value="Portuguese">Portuguese</option>
+                        <option value="Qatari">Qatari</option>
+                        <option value="Romanian">Romanian</option>
+                        <option value="Russian">Russian</option>
+                        <option value="Saudi">Saudi</option>
+                        <option value="South African">South African</option>
+                        <option value="South Korean">South Korean</option>
+                        <option value="Spanish">Spanish</option>
+                        <option value="Sri Lankan">Sri Lankan</option>
+                        <option value="Sudanese">Sudanese</option>
+                        <option value="Swedish">Swedish</option>
+                        <option value="Swiss">Swiss</option>
+                        <option value="Syrian">Syrian</option>
+                        <option value="Taiwanese">Taiwanese</option>
+                        <option value="Thai">Thai</option>
+                        <option value="Tunisian">Tunisian</option>
+                        <option value="Turkish">Turkish</option>
+                        <option value="Ukrainian">Ukrainian</option>
+                        <option value="Venezuelan">Venezuelan</option>
+                        <option value="Vietnamese">Vietnamese</option>
+                        <option value="Yemeni">Yemeni</option>
+                        <option value="Zimbabwean">Zimbabwean</option>
+                    </select>
+                </div>
+                <div class="profile-label">Contact No</div>
+                <div class="yellow-cell"><input type="text" name="profile_contact[]" inputmode="numeric" maxlength="10" placeholder="10 Digits" oninput="enforceNumericLimit(this, 10); saveFormState()"></div>
+                <div class="profile-label">Experience in KSA</div>
+                <div class="yellow-cell" style="padding:0;">
+                    <div class="exp-split-container">
+                        <input type="text" name="profile_ksa_exp_yrs[]" placeholder="0" oninput="this.value = this.value.replace(/\D/g, ''); saveFormState()">
+                        <span>Yrs</span>
+                        <input type="text" name="profile_ksa_exp_mos[]" inputmode="numeric" maxlength="2" placeholder="0" oninput="enforceMonthsLimit(this); saveFormState()">
+                        <span>Mos</span>
+                    </div>
+                </div>
+            </div>
 
             <div class="qualifications-layout-wrapper">
                 <h3 class="qualifications-heading">QUALIFICATIONS</h3>
@@ -968,43 +970,32 @@
                 </div>
 
                 <div class="inline-revisions-container">
-                    <table class="meta-fields-table">
-                        <colgroup>
-                            <col style="width: 10%;">
-                            <col style="width: 32%;">
-                            <col style="width: 20%;">
-                            <col style="width: 38%;">
-                        </colgroup>
-                        <tbody>
-                            <tr>
-                                <td class="profile-label" style="text-align: center;">Location</td>
-                                <td class="yellow-cell">
-                                    <input type="text" name="profile_location[]" oninput="saveFormState()">
-                                </td>
-                                <td class="profile-label" style="text-align: center;" title="Please make sure the file you will be uploading here is a merged file of the following IN SEQUENCE and should be ONLY 1.3mb or less:&#10;&#10;1) Previous Approval Form(if available). IMPORTANT!!!: INCLUDE PREVIOUSLY DOWNGRADED APPROVAL IF ENGINEER WAS PREVIOUSLY DOWNGRADED.&#10;2) Iqama or ID&#10;3) Muqeem Information&#10;4) Engineer's CV(should be stamped, updated and brief)&#10;5) PD Certificate from the PD measuring unit manufacturer(see PD certificate conditions)&#10;6) Engineering Accreditation certifications from Saudi council of Engineers(the specialization must be shown) + barcode&#10;7) GOSI(showing your company's name as an employer - for Saudis only)+barcode.">Credentials Attachment</td>
-                                <td class="yellow-cell">
-                                    <div class="file-wrapper">
-                                        <input type="file" name="profile_credentials[]" accept=".pdf" onclick="triggerSequenceVerificationPrompt(event)" onchange="handleFileChange(this); saveFormState();">
-                                        <span class="upload-badge">✓ Attached</span>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="profile-label" style="text-align: center;">Status</td>
-                                <td class="yellow-cell">
-                                    <select name="profile_status[]" onchange="saveFormState()">
-                                        <option value=""></option>
-                                        <option value="New">New</option>
-                                        <option value="Upgrade">Upgrade</option>
-                                    </select>
-                                </td>
-                                <td class="profile-label" style="text-align: center;">Remarks</td>
-                                <td class="yellow-cell">
-                                    <input type="text" name="profile_remarks[]" oninput="saveFormState()">
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="meta-fields-grid">
+                        <div class="profile-label" style="justify-content: center;">Location</div>
+                        <div class="yellow-cell">
+                            <input type="text" name="profile_location[]" oninput="saveFormState()">
+                        </div>
+                        <div class="profile-label" style="justify-content: center;">Status</div>
+                        <div class="yellow-cell">
+                            <select name="profile_status[]" onchange="saveFormState()">
+                                <option value=""></option>
+                                <option value="New">New</option>
+                                <option value="Upgrade">Upgrade</option>
+                            </select>
+                        </div>
+                        <div class="profile-label" style="justify-content: center;" title="Please make sure the file you will be uploading here is a merged file of the following IN SEQUENCE and should be ONLY 1.3mb or less:&#10;&#10;1) Previous Approval Form(if available). IMPORTANT!!!: INCLUDE PREVIOUSLY DOWNGRADED APPROVAL IF ENGINEER WAS PREVIOUSLY DOWNGRADED.&#10;2) Iqama or ID&#10;3) Muqeem Information&#10;4) Engineer's CV(should be stamped, updated and brief)&#10;5) PD Certificate from the PD measuring unit manufacturer(see PD certificate conditions)&#10;6) Engineering Accreditation certifications from Saudi council of Engineers(the specialization must be shown) + barcode&#10;7) GOSI(showing your company's name as an employer - for Saudis only)+barcode.">Credentials Attachment</div>
+                        <div class="yellow-cell">
+                            <div class="file-wrapper">
+                                <input type="file" name="profile_credentials[]" accept=".pdf" onclick="triggerSequenceVerificationPrompt(event)" onchange="handleFileChange(this); saveFormState();">
+                                <span class="upload-badge">✓ Attached</span>
+                            </div>
+                        </div>
+
+                        <div class="profile-label" style="justify-content: center;">Remarks</div>
+                        <div class="yellow-cell" style="grid-column: 2 / -1;">
+                            <input type="text" name="profile_remarks[]" oninput="saveFormState()">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
