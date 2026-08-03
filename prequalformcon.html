@@ -22,15 +22,6 @@
             box-sizing: border-box;
         }
 
-        .region-request-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 12px;
-        }
-        .region-request-row select { width: 140px; }
-
         .header-panel {
             text-align: center;
             margin-bottom: 15px;
@@ -53,11 +44,24 @@
         .header-actions {
             display: flex;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
             align-items: center;
-            justify-content: flex-start;
+            justify-content: space-between;
             margin-top: 15px;
         }
+        .header-actions-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        .region-request-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .region-request-row select { width: 140px; }
 
         .global-fields-panel {
             display: flex; 
@@ -182,6 +186,9 @@
 
         .meta-fields-table td {
             height: 32px;
+        }
+        .meta-fields-table td.profile-label {
+            white-space: nowrap;
         }
 
         .meta-fields-table input[type="text"] {
@@ -353,19 +360,29 @@
             width: 100%;
             max-width: 100%;
         }
+        .qualifications-heading {
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 4px 0 8px;
+        }
         .qual-table {
             table-layout: fixed;
             min-width: 0;
             font-size: 11px;
         }
-        .qual-table td, .qual-table th {
+        .qual-table thead th {
+            height: 40px;
+            min-height: 40px;
+        }
+        .qual-table tbody td, .qual-table tbody th {
             height: auto;
-            min-height: 32px;
+            min-height: 30px;
             white-space: normal;
             word-break: break-word;
         }
         .qual-tables-row > .qual-table-1 { flex: 18 0 0; }
-        .qual-tables-row > .qual-table-2 { flex: 26 0 0; }
+        .qual-tables-row > .qual-table-2 { flex: 27 0 0; }
         .qual-tables-row > .qual-table-3 { flex: 28 0 0; }
         .qual-tables-row > .qual-table-4 { flex: 28 0 0; }
 
@@ -598,21 +615,23 @@
                 <a href="csd_approvalreq_webtoolguide.html" target="_blank" style="font-size: 13px; color: #007bff; text-decoration: underline;">Click this to open the Instructions/Guides in using this web tool</a>
             </div>
             <div id="header-company-subtitle" class="header-company-subtitle">Company name</div>
-            <div class="region-request-row">
-                <label for="global_region" style="font-weight: bold;">Requesting for Region</label>
-                <select id="global_region" class="yellow-cell" style="height: 32px; border: 1px solid #ccc; font-size: 14px;" onchange="saveFormState()">
-                    <option value=""></option>
-                    <option value="COA">COA</option>
-                    <option value="EOA">EOA</option>
-                    <option value="SOA">SOA</option>
-                    <option value="WOA">WOA</option>
-                </select>
-            </div>
             <div class="header-actions">
-                <button type="button" id="btn-add-engineer" class="btn btn-add" onclick="addNewEngineer()">Add Another Engineer</button>
-                <button type="button" id="btn-reset-form" class="btn btn-reset" onclick="confirmResetForm()">Clear & Reset Form</button>
-                <button type="button" id="btn-submit-pdfs" class="btn btn-submit-pdfs" onclick="handleFormSubmission(event, true)">Generate PDF forms</button>
-                <button type="submit" id="btn-submit-email" class="btn btn-submit">Generate Email Draft & PDF forms</button>
+                <div class="header-actions-buttons">
+                    <button type="button" id="btn-add-engineer" class="btn btn-add" onclick="addNewEngineer()">Add Another Engineer</button>
+                    <button type="button" id="btn-reset-form" class="btn btn-reset" onclick="confirmResetForm()">Clear & Reset Form</button>
+                    <button type="button" id="btn-submit-pdfs" class="btn btn-submit-pdfs" onclick="handleFormSubmission(event, true)">Generate PDF forms</button>
+                    <button type="submit" id="btn-submit-email" class="btn btn-submit">Generate Email Draft & PDF forms</button>
+                </div>
+                <div class="region-request-row">
+                    <label for="global_region" style="font-weight: bold;">Requesting for Region</label>
+                    <select id="global_region" class="yellow-cell" style="height: 32px; border: 1px solid #ccc; font-size: 14px;" onchange="saveFormState()">
+                        <option value=""></option>
+                        <option value="COA">COA</option>
+                        <option value="EOA">EOA</option>
+                        <option value="SOA">SOA</option>
+                        <option value="WOA">WOA</option>
+                    </select>
+                </div>
             </div>
         </div>
         
@@ -757,12 +776,13 @@
             <div class="table-gap"></div>
 
             <div class="qualifications-layout-wrapper">
+                <h3 class="qualifications-heading">QUALIFICATIONS</h3>
                 <div class="qual-tables-row">
                     <table class="qual-table qual-table-1">
                         <thead>
                             <tr>
-                                <th style="width: 65%;"></th>
-                                <th style="width: 35%;">No Voltage<br>Level</th>
+                                <th style="width: 70%;"></th>
+                                <th style="width: 30%;">No Voltage<br>Level</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -798,10 +818,10 @@
                     <table class="qual-table qual-table-2">
                         <thead>
                             <tr>
-                                <th style="width: 48%;"></th>
-                                <th style="width: 17%;">MV</th>
-                                <th style="width: 17%;">HV</th>
-                                <th style="width: 18%;">EHV</th>
+                                <th style="width: 54%;"></th>
+                                <th style="width: 15%;">MV</th>
+                                <th style="width: 15%;">HV</th>
+                                <th style="width: 16%;">EHV</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -849,10 +869,10 @@
                     <table class="qual-table qual-table-3">
                         <thead>
                             <tr>
-                                <th style="width: 52%;"></th>
-                                <th style="width: 16%;">MV</th>
-                                <th style="width: 16%;">HV</th>
-                                <th style="width: 16%;">EHV</th>
+                                <th style="width: 58%;"></th>
+                                <th style="width: 14%;">MV</th>
+                                <th style="width: 14%;">HV</th>
+                                <th style="width: 14%;">EHV</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -900,10 +920,10 @@
                     <table class="qual-table qual-table-4">
                         <thead>
                             <tr>
-                                <th style="width: 52%;"></th>
-                                <th style="width: 16%;">MV</th>
-                                <th style="width: 16%;">HV</th>
-                                <th style="width: 16%;">EHV</th>
+                                <th style="width: 58%;"></th>
+                                <th style="width: 14%;">MV</th>
+                                <th style="width: 14%;">HV</th>
+                                <th style="width: 14%;">EHV</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -950,10 +970,10 @@
                 <div class="inline-revisions-container">
                     <table class="meta-fields-table">
                         <colgroup>
-                            <col style="width: 12%;">
+                            <col style="width: 10%;">
+                            <col style="width: 32%;">
+                            <col style="width: 20%;">
                             <col style="width: 38%;">
-                            <col style="width: 16%;">
-                            <col style="width: 34%;">
                         </colgroup>
                         <tbody>
                             <tr>
@@ -1311,20 +1331,13 @@
     }
 
     function syncRecordHeights(record) {
-        if (!record) return;
-        const profileTable = record.querySelector('.profile-table');
-        const qualWrapper = record.querySelector('.qualifications-layout-wrapper');
-        if (!profileTable || !qualWrapper) return;
-
-        profileTable.style.height = 'auto';
-        qualWrapper.style.height = 'auto';
-
-        const profileHeight = profileTable.getBoundingClientRect().height;
-        const qualHeight = qualWrapper.getBoundingClientRect().height;
-        const targetHeight = Math.max(profileHeight, qualHeight);
-
-        profileTable.style.height = targetHeight + 'px';
-        qualWrapper.style.height = targetHeight + 'px';
+        // No-op: this used to force the profile table and qualifications
+        // table to matching pixel heights, back when they sat side-by-side
+        // as two columns. They're now stacked vertically, so there's
+        // nothing that needs height-matching — CSS handles natural sizing
+        // on its own. Kept as a no-op (rather than removing every call
+        // site) so nothing else in the file needs to change.
+        return;
     }
 
     function syncAllRecordHeights() {
