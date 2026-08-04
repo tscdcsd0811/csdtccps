@@ -38,6 +38,13 @@
     width: 260px;
     flex-shrink: 0;
     background: #0a1f44;
+    /* 100vh is the floor (matches previous behavior on normal-height
+       pages); align-items: stretch on .app-shell (the default, no
+       override here) makes the sidebar grow taller than that whenever
+       .app-main's actual content is taller than one viewport, so the
+       navy background always reaches the bottom of the page even when
+       a vertical scrollbar is required. */
+    min-height: 100vh;
     box-sizing: border-box;
     padding: 0;
     display: flex;
@@ -142,13 +149,22 @@
         padding: 10px 14px;
     }
     .app-sidebar .sidebar-logo {
-        padding: 0;
-        margin-right: 14px;
+        /* flex-basis: 100% inside the wrapping row below makes the logo
+           consume the entire first line by itself, pushing nav + the
+           sign-in/logout area onto their own row underneath — so the
+           logo is centered independent of however much nav content
+           follows it, instead of relying on matching gaps on either
+           side of it in a shared row. */
+        flex: 0 0 100%;
+        width: 100%;
+        padding: 0 0 10px;
+        margin-right: 0;
     }
     .app-sidebar .sidebar-logo img {
         max-height: 32px;
         max-width: 120px;
         padding: 3px;
+        margin: 0 auto;
     }
     .app-sidebar nav {
         display: flex;
