@@ -189,6 +189,30 @@
         });
 
         var accounts = msalInstance.getAllAccounts();
+
+        // CLOSE_IF_SIGNED_OUT pages (the Contractor Web Tool Guide) are
+        // opened as a brand-new tab, so they only have whatever
+        // sessionStorage the browser cloned from the opener tab at the
+        // moment they were opened. That clone isn't always reliably
+        // populated by the time this script runs, which could make a
+        // genuinely signed-in visitor look signed-out here and close
+        // the tab immediately. Before concluding that, double-check
+        // against the person's actual Microsoft sign-in session with a
+        // silent (no popup) SSO check.
+        if (!accounts.length && window.CLOSE_IF_SIGNED_OUT) {
+            try {
+                var ssoResult = await msalInstance.ssoSilent({
+                    scopes: window.MSAL_LOGIN_SCOPES || ["openid", "profile"]
+                });
+                if (ssoResult && ssoResult.account) {
+                    accounts = [ssoResult.account];
+                }
+            } catch (err) {
+                // Genuinely not signed in — fall through to the normal
+                // "no accounts" handling below, which will close the tab.
+            }
+        }
+
         if (!accounts.length) {
             if (window.AUTH_OPTIONAL) {
                 revealAnonymous();
