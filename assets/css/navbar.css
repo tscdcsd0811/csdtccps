@@ -1,7 +1,7 @@
 /*
  * Shared app navbar (left sidebar) styles.
  * Used by: prequalformcon.html, prequalformint.html,
- * csd_approvalreq_webtoolguide.html, csd_approvalint_webtoolguide.html.
+ * csd_approvalreq_webtoolguide.html.
  *
  * Markup contract expected on each page:
  *
@@ -28,22 +28,27 @@
 
 .app-shell {
     display: flex;
-    align-items: flex-start;
+    /* No align-items override: the default (stretch) makes the sidebar's
+       height always match whatever the page content (.app-main) actually
+       renders at, whether that's shorter or taller than one viewport,
+       instead of being pinned to a fixed height. */
 }
 
 .app-sidebar {
     width: 260px;
     flex-shrink: 0;
     background: #0a1f44;
-    min-height: 100vh;
     box-sizing: border-box;
-    padding: 20px 0 0;
+    padding: 0;
     display: flex;
     flex-direction: column;
 }
 
 .app-sidebar .sidebar-logo {
-    padding: 0 18px 24px;
+    /* Top, left, and right are equal (20px) so the logo sits centered
+       in its own corner; bottom is larger to separate it from the nav
+       links below. */
+    padding: 20px 20px 24px;
 }
 
 .app-sidebar .sidebar-logo img {
@@ -103,6 +108,8 @@
 
 .sidebar-bottom .btn-link-logout {
     color: #ff9d9d;
+    font-size: 16px;
+    padding: 6px 0;
 }
 
 .sidebar-bottom .btn-link-logout:hover {

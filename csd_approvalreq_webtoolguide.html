@@ -19,14 +19,17 @@
 </head>
 <body>
 
+<div id="auth-close-fallback" style="display:none; max-width: 420px; margin: 80px auto; padding: 24px; border: 1px solid #ddd; border-radius: 8px; background: #fafafa; font-family: Arial, sans-serif; text-align: center;">
+    <p style="margin: 0 0 16px; color: #333;">You're not signed in, so this page can't stay open.</p>
+    <button type="button" onclick="window.close()" style="font: inherit; font-size: 14px; padding: 8px 16px; cursor: pointer;">Close this tab</button>
+</div>
+
 <div class="app-shell">
     <aside class="app-sidebar no-print">
         <div class="sidebar-logo"><img src="nglogo.jpg" alt="National Grid SA"></div>
         <nav>
             <a href="prequalformcon.html" data-roles="external,admin">T&amp;C Contractor Engineer's Approval Request</a>
             <a href="prequalformint.html" data-roles="internal,admin">T&amp;C Internal Engineer's Approval Request</a>
-            <a href="csd_approvalreq_webtoolguide.html" data-roles="external,admin">Contractor Web Tool Guide</a>
-            <a href="csd_approvalint_webtoolguide.html" data-roles="internal,admin">Internal Web Tool Guide</a>
             <a href="https://1drv.ms/f/c/9c4e6640b2f178ee/IgC4WRAlX58ESbdbD8CUfK8GAS6SYpyHQZKqQrDJRlQx9ZU" target="_blank" rel="noopener" data-roles="external,admin">CSD Approved Documents</a>
         </nav>
         <div class="sidebar-bottom">
@@ -85,11 +88,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3/lib/msal-browser.min.js"></script>
     <script src="assets/js/msal-config.js"></script>
-    <!-- This guide is public: no sign-in is required to view it. If the
-         visitor happens to already be signed in, AUTH_OPTIONAL still
-         resolves their profile so the navbar can show the right buttons
-         for their role. -->
-    <script>window.AUTH_OPTIONAL = true;</script>
+    <!-- This guide is no longer linked from the navbar; it's only reachable
+         via the "Click this to open the Instructions/Guides..." link on
+         prequalformcon.html, which opens it in a new tab. It requires the
+         visitor to already be signed in (any role): if they aren't, or if
+         they sign out in another tab while this one is still open, this
+         tab closes itself rather than redirecting anywhere. -->
+    <script>window.CLOSE_IF_SIGNED_OUT = true;</script>
     <script src="assets/js/auth-guard.js"></script>
     <script src="assets/js/navbar.js"></script>
 </body>

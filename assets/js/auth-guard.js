@@ -15,12 +15,22 @@
  *       backwards compatibility and is treated as a one-item list.)
  *
  *   window.AUTH_OPTIONAL = true;
- *       The page does not require sign-in at all (e.g. the web tool
- *       guides). If nobody is signed in, the page is simply revealed
- *       with no role information. If someone IS signed in, their
- *       profile is still resolved as normal so the navbar can show the
- *       right buttons for their role. REQUIRED_ROLES is ignored on
- *       AUTH_OPTIONAL pages.
+ *       The page does not require sign-in at all. If nobody is signed
+ *       in, the page is simply revealed with no role information. If
+ *       someone IS signed in, their profile is still resolved as normal
+ *       so the navbar can show the right buttons for their role.
+ *       REQUIRED_ROLES is ignored on AUTH_OPTIONAL pages.
+ *
+ *   window.CLOSE_IF_SIGNED_OUT = true;
+ *       The opposite of AUTH_OPTIONAL: this page requires sign-in, but
+ *       instead of redirecting a signed-out visitor to index.html, the
+ *       tab just closes itself (used for the Contractor Web Tool Guide,
+ *       which is only ever opened as a secondary tab from a link on a
+ *       page that already required sign-in). This also happens live: if
+ *       the person logs out from another tab of this app while this tab
+ *       is still open, this tab closes itself immediately. A page must
+ *       set a div#auth-close-fallback element for the case where the
+ *       browser blocks a script-initiated tab close.
  *
  * Leave both unset on the login page (index.html).
  *
@@ -56,7 +66,44 @@
     var msalInstance = new window.msal.PublicClientApplication(window.MSAL_CONFIG);
     window.msalInstance = msalInstance; // exposed in case the page wants it (e.g. logout button)
 
+    // Cross-tab "someone logged out" signal. Each tab has its own
+    // sessionStorage (deliberately, see msal-config.js), so a logout in
+    // one tab doesn't touch another tab's MSAL cache by itself; this
+    // channel is how a CLOSE_IF_SIGNED_OUT tab finds out live.
+    var AUTH_BROADCAST_CHANNEL = "csdtccps-auth";
+    function getAuthChannel() {
+        if (typeof BroadcastChannel === "undefined") return null;
+        if (!window.__csdtccpsAuthChannel) {
+            try {
+                window.__csdtccpsAuthChannel = new BroadcastChannel(AUTH_BROADCAST_CHANNEL);
+            } catch (err) {
+                return null;
+            }
+        }
+        return window.__csdtccpsAuthChannel;
+    }
+
+    function closeThisTab() {
+        // Don't reveal the real page content on the way out — just
+        // attempt to close, and fall back to a manual-close message if
+        // the browser blocks a script-initiated close (e.g. no opener,
+        // or a strict browser policy).
+        try {
+            window.close();
+        } catch (err) {
+            // ignore
+        }
+        setTimeout(function () {
+            var fallback = document.getElementById("auth-close-fallback");
+            if (fallback) fallback.style.display = "block";
+        }, 250);
+    }
+
     function goToLogin(reason) {
+        if (window.CLOSE_IF_SIGNED_OUT) {
+            closeThisTab();
+            return;
+        }
         var suffix = reason ? ("?reason=" + encodeURIComponent(reason)) : "";
         window.location.replace("index.html" + suffix);
     }
@@ -105,6 +152,10 @@
         if (!logoutBtn || logoutBtn.dataset.wired) return;
         logoutBtn.dataset.wired = "1";
         logoutBtn.addEventListener("click", function () {
+            var channel = getAuthChannel();
+            if (channel) {
+                try { channel.postMessage({ type: "logout" }); } catch (err) { /* ignore */ }
+            }
             msalInstance.logoutRedirect({
                 account: account,
                 // onRedirectNavigate returning false stops MSAL from
@@ -200,6 +251,18 @@
         document.dispatchEvent(new CustomEvent("auth-ready", { detail: window.authProfile }));
 
         wireLogoutButton(account);
+
+        if (window.CLOSE_IF_SIGNED_OUT) {
+            var authChannel = getAuthChannel();
+            if (authChannel) {
+                authChannel.addEventListener("message", function (event) {
+                    if (event && event.data && event.data.type === "logout") {
+                        closeThisTab();
+                    }
+                });
+            }
+        }
+
 
         // Note: there is intentionally no "change password" feature here.
         // Under Entra ID, this app never sees, stores, or handles a

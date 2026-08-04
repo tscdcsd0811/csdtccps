@@ -90,14 +90,16 @@ starts empty — same fallback behavior as before, nothing breaks.
 4. Should land on the correct form (`prequalformint.html` for Internal,
    `prequalformcon.html` for External or Admin) with their name/company
    pre-filled. Admins can use the navbar to switch between
-   `prequalformcon.html` and `prequalformint.html` and both web tool
-   guides.
+   `prequalformcon.html` and `prequalformint.html`.
 5. A user with no role assigned should see "Your account does not have
    access assigned yet."
-6. The two web tool guide pages (`csd_approvalreq_webtoolguide.html` and
-   `csd_approvalint_webtoolguide.html`) can be opened by anyone, signed in
-   or not — they no longer require sign-in. If the visitor is signed in,
-   the navbar on those pages still only shows the buttons for their role.
+6. The Contractor Web Tool Guide (`csd_approvalreq_webtoolguide.html`) is
+   no longer in the navbar. It's reachable via the "Click this to open
+   the Instructions/Guides in using this web tool" link on
+   `prequalformcon.html`, which opens it in a new tab. It requires the
+   visitor to already be signed in — if they aren't (or if they sign out
+   from another tab while it's open), the tab closes itself instead of
+   showing content. There is no longer an Internal Web Tool Guide page.
 7. The "CSD Approved Documents" navbar link (visible only to External and
    Admin users) opens the shared OneDrive folder directly on OneDrive's
    own site, in a new tab. This app does not check OneDrive permissions
