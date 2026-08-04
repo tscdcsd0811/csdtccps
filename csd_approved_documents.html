@@ -1,188 +1,460 @@
 <!DOCTYPE html>
 <html lang="en" class="auth-checking">
 <head>
-<style>
-    html.auth-checking body { display: none !important; }
-</style>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CSD Approved Documents - Engineers Qualification Board</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        background-color: #ffffff;
-        color: #000000;
-    }
-    .app-shell { display: flex; align-items: flex-start; }
-    .app-sidebar {
-        width: 220px;
-        flex-shrink: 0;
-        background: #0a1f44;
-        min-height: 100vh;
-        padding: 20px 0;
-        box-sizing: border-box;
-    }
-    .app-sidebar .sidebar-logo { padding: 0 18px 24px; }
-    .app-sidebar .sidebar-logo img {
-        max-width: 100%;
-        display: block;
-        background: #fff;
-        border-radius: 4px;
-        padding: 6px;
-    }
-    .app-sidebar nav a {
-        display: block;
-        padding: 10px 18px;
-        font-size: 14px;
-        color: #cfe0ff;
-        text-decoration: underline;
-        line-height: 1.4;
-    }
-    .app-sidebar nav a.active { color: #ffffff; font-weight: bold; }
-    .app-main { flex: 1; min-width: 0; padding: 20px; box-sizing: border-box; }
+    <style>
+        html.auth-checking body { display: none !important; }
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSD Approved Documents</title>
+    <!-- FontAwesome for file/folder icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/navbar.css">
+    <style>
+        :root {
+            --bg-page: #f4f6f9;
+            --bg-card: #ffffff;
+            --bg-ui: #f8f9fb;
+            --primary-accent: #0056b3;
+            --status-green: #16a34a;
+            --status-red: #dc2626;
+            --text-main: #333333;
+            --text-dark: #667085;
+            --text-highlight: #111827;
+            --row-hover: #f1f5fb;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --border-color: #e2e6ec;
+        }
 
-    .top-user-bar {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 14px;
-        padding: 0 0 8px;
-        flex-wrap: wrap;
-    }
-    .top-user-bar .user-email { font-size: 12px; color: #555; }
-    .btn-link {
-        background: none; border: none; padding: 0; font: inherit;
-        font-size: 12px; font-weight: bold; cursor: pointer;
-        text-decoration: underline; box-shadow: none;
-    }
-    .btn-link-logout { color: #dc3545; }
-    .btn-link-logout:hover { color: #a71d2a; }
+        body {
+            font-family: var(--font-family);
+            background-color: #ffffff;
+            color: var(--text-main);
+            margin: 0;
+        }
 
-    h2 {
-        font-size: 16px; font-weight: bold; margin: 0 0 16px;
-        text-transform: uppercase; letter-spacing: 0.5px; text-align: center;
-    }
+        .viewer-container {
+            width: 100%;
+            max-width: 1300px;
+            margin: 0 auto;
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(16, 24, 40, 0.08);
+            border: 1px solid var(--border-color);
+        }
 
-    .docs-layout {
-        display: flex;
-        gap: 20px;
-        align-items: flex-start;
-    }
-    .docs-notice-panel {
-        width: 260px;
-        flex-shrink: 0;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        background: #f8f9fa;
-        padding: 16px;
-        box-sizing: border-box;
-    }
-    .docs-notice-panel h3 {
-        font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px;
-        margin: 0 0 10px; color: #333;
-    }
-    .docs-notice-panel ul { margin: 0; padding-left: 18px; }
-    .docs-notice-panel li { font-size: 13px; margin-bottom: 10px; line-height: 1.4; }
-    .docs-notice-panel .notice-date { display: block; font-size: 11px; color: #777; }
+        /* Top toolbar: breadcrumb + search + open-in-OneDrive */
+        .top-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            padding: 16px 24px;
+            background-color: var(--bg-ui);
+            border-bottom: 1px solid var(--border-color);
+        }
 
-    .docs-embed-wrapper {
-        flex: 1;
-        min-width: 0;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        overflow: hidden;
-        min-height: 640px;
-    }
-    .docs-open-card {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #f8f9fa;
-        text-align: center;
-        padding: 40px;
-    }
-    .docs-open-card-inner { max-width: 360px; }
-    .docs-open-card-inner p {
-        font-size: 14px;
-        color: #555;
-        margin: 0 0 20px;
-        line-height: 1.5;
-    }
-    .docs-open-btn {
-        display: inline-block;
-        background: #0d6efd;
-        color: #fff;
-        text-decoration: none;
-        font-weight: bold;
-        font-size: 14px;
-        padding: 12px 22px;
-        border-radius: 6px;
-    }
-    .docs-open-btn:hover { background: #0b5ed7; }
-</style>
-<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3/lib/msal-browser.min.js"></script>
-<script src="assets/js/msal-config.js"></script>
-<script>window.REQUIRED_ROLE = "external";</script>
-<script src="assets/js/auth-guard.js"></script>
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            font-size: 14px;
+            color: var(--text-dark);
+            min-width: 0;
+        }
+        .breadcrumb .crumb {
+            cursor: pointer;
+            color: var(--primary-accent);
+            text-decoration: underline;
+            white-space: nowrap;
+        }
+        .breadcrumb .crumb.current {
+            color: var(--text-highlight);
+            font-weight: 600;
+            text-decoration: none;
+            cursor: default;
+        }
+        .breadcrumb .sep { color: var(--text-dark); }
+
+        .search-bar {
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            width: 280px;
+            max-width: 100%;
+        }
+        .search-bar i { color: var(--text-dark); margin-right: 8px; }
+        .search-bar input {
+            background: transparent;
+            border: none;
+            color: var(--text-highlight);
+            padding: 9px 0;
+            outline: none;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        /* List header */
+        .list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            padding: 14px 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .list-title { display: flex; align-items: center; gap: 10px; }
+        .status-dot {
+            width: 8px; height: 8px;
+            background-color: var(--status-red);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .status-dot.connected { background-color: var(--status-green); }
+        .viewer-label { font-size: 15px; font-weight: 600; color: var(--text-highlight); }
+
+        .open-external, .btn-refresh {
+            color: var(--primary-accent);
+            text-decoration: none;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 6px 12px;
+            cursor: pointer;
+        }
+        .open-external:hover, .btn-refresh:hover { background-color: var(--row-hover); }
+
+        /* File table */
+        .file-list-table { width: 100%; border-collapse: collapse; }
+        .file-list-table th, .file-list-table td { text-align: left; padding: 14px 24px; }
+        .file-list-table th {
+            font-size: 12px; font-weight: 600;
+            color: var(--text-dark); text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .file-row { cursor: pointer; transition: background 0.1s; }
+        .file-row:hover { background-color: var(--row-hover); }
+        .file-cell { color: var(--text-highlight); display: flex; align-items: center; gap: 12px; }
+        .file-cell i { color: var(--text-dark); width: 18px; text-align: center; }
+        .file-cell .file-icon-folder { color: #f5b942; }
+        .file-cell .file-icon-pdf { color: #dc2626; }
+        .file-cell .file-icon-doc { color: #2563eb; }
+        .file-cell .file-icon-xls { color: #16a34a; }
+        .modified-cell { font-size: 13px; color: var(--text-dark); }
+        .modified-date { white-space: nowrap; }
+        .modified-by { display: block; opacity: 0.8; white-space: nowrap; }
+        .message-row { text-align: center; color: var(--text-dark); padding: 40px; }
+
+        @media (max-width: 820px) {
+            .top-toolbar { flex-direction: column; align-items: stretch; }
+            .search-bar { width: 100%; }
+            .list-header { flex-direction: column; align-items: stretch; }
+            .modified-cell { display: none; }
+            .file-list-table th.col-modified { display: none; }
+        }
+    </style>
 </head>
 <body>
 
 <div class="app-shell">
-    <aside class="app-sidebar">
+    <aside class="app-sidebar no-print">
         <div class="sidebar-logo"><img src="nglogo.jpg" alt="National Grid SA"></div>
         <nav>
-            <a href="prequalformcon.html">T&amp;C Engineer's Approval Request</a>
-            <a href="csd_approved_documents.html" class="active">CSD Approved Documents</a>
+            <a href="prequalformcon.html" data-roles="external,admin">T&amp;C Contractor Engineer's Approval Request</a>
+            <a href="prequalformint.html" data-roles="internal,admin">T&amp;C Internal Engineer's Approval Request</a>
+            <a href="csd_approvalreq_webtoolguide.html" data-roles="external,admin">Contractor Web Tool Guide</a>
+            <a href="csd_approvalint_webtoolguide.html" data-roles="internal,admin">Internal Web Tool Guide</a>
+            <a href="csd_approved_documents.html" data-roles="external,admin">CSD Approved Documents</a>
         </nav>
+        <div class="sidebar-bottom">
+            <span id="auth-user-email" class="user-email"></span>
+            <a href="index.html" id="nav-signin-link" class="btn-link btn-link-signin">Sign in</a>
+            <button type="button" id="btn-logout" class="btn-link btn-link-logout">Log out</button>
+        </div>
     </aside>
     <div class="app-main">
 
-        <div class="top-user-bar">
-            <span id="auth-user-email" class="user-email"></span>
-            <button type="button" id="btn-logout" class="btn-link btn-link-logout">Log out</button>
-        </div>
-
-        <h2>CSD Approved Documents / Work Instructions</h2>
-
-        <div class="docs-layout">
-            <!--
-                MANUAL "recently updated" panel.
-                Edit the list below by hand whenever a file in the OneDrive
-                folder is added or changed — add a new <li> at the top,
-                delete old ones you no longer want shown. No code changes
-                needed beyond editing this list.
-            -->
-            <div class="docs-notice-panel">
-                <h3>Recently updated</h3>
-                <ul id="recent-updates-list">
-                    <li>
-                        Example: "NGC_00008_PM_009 CSD Energization Procedure" updated.
-                        <span class="notice-date">Aug 2, 2026</span>
-                    </li>
-                    <li>
-                        Example: New template added — "CSD Project Closing".
-                        <span class="notice-date">Jul 22, 2026</span>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="docs-embed-wrapper docs-open-card">
-                <div class="docs-open-card-inner">
-                    <p>
-                        The approved documents folder opens in a new tab —
-                        OneDrive's own file browser, always up to date.
-                    </p>
-                    <a href="https://1drv.ms/f/c/9c4e6640b2f178ee/IgC4WRAlX58ESbdbD8CUfK8GAbRr3YYKpJI--VasLsMPKEQ?e=aILPJy"
-                       target="_blank" rel="noopener" class="docs-open-btn">
-                        Open CSD Approved Documents Folder &#8599;
-                    </a>
+        <div class="viewer-container">
+            <div class="top-toolbar">
+                <div class="breadcrumb" id="breadcrumb"></div>
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="search-input" placeholder="Search this folder...">
                 </div>
             </div>
+
+            <div class="list-header">
+                <div class="list-title">
+                    <div id="status-indicator" class="status-dot"></div>
+                    <div class="viewer-label">CSD Approved Documents</div>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button type="button" class="btn-refresh" id="btn-refresh"><i class="fas fa-rotate-right"></i> Refresh</button>
+                    <a href="https://1drv.ms/f/c/9c4e6640b2f178ee/IgC4WRAlX58ESbdbD8CUfK8GAbRr3YYKpJI--VasLsMPKEQ?e=aILPJy" target="_blank" rel="noopener" class="open-external">Open in OneDrive <i class="fas fa-external-link-alt"></i></a>
+                </div>
+            </div>
+
+            <table class="file-list-table">
+                <thead>
+                    <tr>
+                        <th width="70%">Title</th>
+                        <th width="30%" class="col-modified">Last Modified</th>
+                    </tr>
+                </thead>
+                <tbody id="file-list-body">
+                    <tr><td colspan="2" class="message-row">Waiting for sign-in...</td></tr>
+                </tbody>
+            </table>
         </div>
 
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3/lib/msal-browser.min.js"></script>
+<script src="assets/js/msal-config.js"></script>
+<script>window.REQUIRED_ROLES = ["external", "admin"];</script>
+<script src="assets/js/auth-guard.js"></script>
+<script src="assets/js/navbar.js"></script>
+<script>
+(function () {
+    "use strict";
+
+    // The specific shared OneDrive folder this page browses. Everything
+    // below this root is reached by clicking into folders (Microsoft
+    // Graph "shares" API + normal drive item children calls) - no
+    // separate sign-in of its own, it reuses the same signed-in session
+    // auth-guard.js already established for the rest of the app.
+    var SHARE_URL = "https://1drv.ms/f/c/9c4e6640b2f178ee/IgC4WRAlX58ESbdbD8CUfK8GAbRr3YYKpJI--VasLsMPKEQ?e=aILPJy";
+    var GRAPH_SCOPES = ["Files.Read.All"];
+
+    var tableBody = document.getElementById("file-list-body");
+    var statusIndicator = document.getElementById("status-indicator");
+    var breadcrumbEl = document.getElementById("breadcrumb");
+    var searchInput = document.getElementById("search-input");
+    var refreshBtn = document.getElementById("btn-refresh");
+
+    var driveId = null;          // resolved once from the share link, reused for every subfolder
+    var crumbs = [];             // [{ id, name }] - crumbs[0] is always the shared folder's root
+    var currentToken = null;
+    var currentFiles = [];
+
+    function showError(message) {
+        tableBody.innerHTML = '<tr><td colspan="2" class="message-row" style="color: var(--status-red)">' + escapeHtml(message) + "</td></tr>";
+        statusIndicator.classList.remove("connected");
+    }
+
+    function escapeHtml(str) {
+        var div = document.createElement("div");
+        div.textContent = str == null ? "" : String(str);
+        return div.innerHTML;
+    }
+
+    function getGraphShareId(url) {
+        var encodedUrl = btoa(url).replace(/\//g, "_").replace(/\+/g, "-").replace(/=/g, "");
+        return "u!" + encodedUrl;
+    }
+
+    async function getGraphToken() {
+        var account = window.msalInstance.getActiveAccount();
+        try {
+            var result = await window.msalInstance.acquireTokenSilent({ account: account, scopes: GRAPH_SCOPES });
+            return result.accessToken;
+        } catch (err) {
+            // First time this app has asked for OneDrive/Files access for
+            // this person: acquireTokenSilent can't get a token without a
+            // prompt, so ask via a popup instead of a full-page redirect
+            // (keeps this page's state intact).
+            console.warn("[onedrive] silent token failed, trying popup:", err);
+            var popupResult = await window.msalInstance.acquireTokenPopup({ account: account, scopes: GRAPH_SCOPES });
+            return popupResult.accessToken;
+        }
+    }
+
+    function getFileIconClass(item) {
+        if (item.folder) return "fas fa-folder file-icon-folder";
+        var name = (item.name || "").toLowerCase();
+        if (name.endsWith(".pdf")) return "fas fa-file-pdf file-icon-pdf";
+        if (name.endsWith(".doc") || name.endsWith(".docx")) return "fas fa-file-word file-icon-doc";
+        if (name.endsWith(".xls") || name.endsWith(".xlsx")) return "fas fa-file-excel file-icon-xls";
+        if (name.endsWith(".ppt") || name.endsWith(".pptx")) return "fas fa-file-powerpoint";
+        if (name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png") || name.endsWith(".gif")) return "fas fa-image";
+        return "fas fa-file";
+    }
+
+    function renderBreadcrumb() {
+        breadcrumbEl.innerHTML = "";
+        crumbs.forEach(function (crumb, index) {
+            if (index > 0) {
+                var sep = document.createElement("span");
+                sep.className = "sep";
+                sep.textContent = " / ";
+                breadcrumbEl.appendChild(sep);
+            }
+            var span = document.createElement("span");
+            span.textContent = crumb.name;
+            var isLast = index === crumbs.length - 1;
+            span.className = "crumb" + (isLast ? " current" : "");
+            if (!isLast) {
+                span.addEventListener("click", function () {
+                    crumbs = crumbs.slice(0, index + 1);
+                    loadFolder(crumb.id);
+                });
+            }
+            breadcrumbEl.appendChild(span);
+        });
+    }
+
+    function renderFileList(items) {
+        currentFiles = items || [];
+        applySearchFilter();
+    }
+
+    function applySearchFilter() {
+        var term = (searchInput.value || "").trim().toLowerCase();
+        var items = term
+            ? currentFiles.filter(function (f) { return (f.name || "").toLowerCase().indexOf(term) !== -1; })
+            : currentFiles;
+
+        tableBody.innerHTML = "";
+        if (!items.length) {
+            tableBody.innerHTML = '<tr><td colspan="2" class="message-row">' + (term ? "No files match your search." : "This folder is empty.") + "</td></tr>";
+            return;
+        }
+
+        // Folders first, then files, both alphabetical.
+        items = items.slice().sort(function (a, b) {
+            var aFolder = a.folder ? 0 : 1;
+            var bFolder = b.folder ? 0 : 1;
+            if (aFolder !== bFolder) return aFolder - bFolder;
+            return (a.name || "").localeCompare(b.name || "");
+        });
+
+        items.forEach(function (item) {
+            var row = document.createElement("tr");
+            row.className = "file-row";
+
+            var dateObj = item.lastModifiedDateTime ? new Date(item.lastModifiedDateTime) : null;
+            var formattedDate = dateObj ? dateObj.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "";
+            var modifierName = (item.lastModifiedBy && item.lastModifiedBy.user && item.lastModifiedBy.user.displayName) || "";
+
+            var nameCell = document.createElement("td");
+            nameCell.className = "file-cell";
+            nameCell.innerHTML = '<i class="' + getFileIconClass(item) + '"></i><span title="' + escapeHtml(item.name) + '">' + escapeHtml(item.name) + "</span>";
+
+            var modCell = document.createElement("td");
+            modCell.className = "modified-cell";
+            modCell.innerHTML = '<span class="modified-date">' + escapeHtml(formattedDate) + "</span>" +
+                (modifierName ? '<span class="modified-by">' + escapeHtml(modifierName) + "</span>" : "");
+
+            row.appendChild(nameCell);
+            row.appendChild(modCell);
+
+            row.addEventListener("click", function () {
+                if (item.folder) {
+                    crumbs.push({ id: item.id, name: item.name });
+                    loadFolder(item.id);
+                } else if (item.webUrl) {
+                    window.open(item.webUrl, "_blank", "noopener");
+                }
+            });
+
+            tableBody.appendChild(row);
+        });
+    }
+
+    async function loadFolder(itemId) {
+        tableBody.innerHTML = '<tr><td colspan="2" class="message-row">Loading...</td></tr>';
+        renderBreadcrumb();
+        try {
+            var url = "https://graph.microsoft.com/v1.0/drives/" + driveId + "/items/" + itemId +
+                "/children?$top=200&$select=id,name,folder,file,lastModifiedDateTime,lastModifiedBy,webUrl";
+            var response = await fetch(url, { headers: { Authorization: "Bearer " + currentToken } });
+            if (!response.ok) throw new Error("HTTP " + response.status);
+            var data = await response.json();
+            statusIndicator.classList.add("connected");
+            renderFileList(data.value);
+        } catch (err) {
+            console.error(err);
+            showError("Could not load this folder. Please try Refresh, or use Open in OneDrive above.");
+        }
+    }
+
+    async function loadRoot() {
+        tableBody.innerHTML = '<tr><td colspan="2" class="message-row">Connecting to OneDrive...</td></tr>';
+        try {
+            currentToken = await getGraphToken();
+        } catch (err) {
+            console.error(err);
+            showError("Could not get permission to read OneDrive. Please try again, or contact your administrator.");
+            return;
+        }
+
+        try {
+            var shareId = getGraphShareId(SHARE_URL);
+            var response = await fetch("https://graph.microsoft.com/v1.0/shares/" + shareId + "/driveItem?$select=id,name,parentReference", {
+                headers: { Authorization: "Bearer " + currentToken }
+            });
+            if (!response.ok) {
+                if (response.status === 401 || response.status === 403 || response.status === 404) {
+                    throw new Error("Access denied: this OneDrive folder isn't shared with your account. Contact your administrator if you believe this is a mistake.");
+                }
+                throw new Error("HTTP " + response.status);
+            }
+            var rootItem = await response.json();
+            driveId = rootItem.parentReference.driveId;
+            crumbs = [{ id: rootItem.id, name: "CSD Approved Documents" }];
+            await loadFolder(rootItem.id);
+        } catch (err) {
+            console.error(err);
+            showError(err.message || "Could not retrieve files. Check console for details.");
+        }
+    }
+
+    var searchDebounce = null;
+    searchInput.addEventListener("input", function () {
+        clearTimeout(searchDebounce);
+        searchDebounce = setTimeout(applySearchFilter, 150);
+    });
+
+    refreshBtn.addEventListener("click", function () {
+        if (crumbs.length) {
+            loadFolder(crumbs[crumbs.length - 1].id);
+        } else {
+            loadRoot();
+        }
+    });
+
+    function onAuthReady(profile) {
+        if (profile) {
+            loadRoot();
+        } else {
+            showError("Please sign in to view these documents.");
+        }
+    }
+
+    document.addEventListener("auth-ready", function (e) {
+        onAuthReady(e.detail);
+    });
+
+    // auth-guard.js may finish (and dispatch "auth-ready") before this
+    // script even runs, especially once everything resolves from cache
+    // with no real network delay - don't wait forever in that case.
+    if (window.authProfile !== undefined) {
+        onAuthReady(window.authProfile);
+    }
+})();
+</script>
 </body>
 </html>

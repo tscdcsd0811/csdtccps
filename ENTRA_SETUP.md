@@ -67,7 +67,23 @@ invite them by email first (they accept once, then show up as assignable
 users in step above). This is the equivalent of adding a user in Supabase
 Auth.
 
-## 5. Set each user's name / company info
+## 5. Grant the "Files.Read.All" API permission (for the OneDrive viewer)
+
+`csd_approved_documents.html` browses a shared OneDrive folder in-page
+using the signed-in user's own Microsoft Graph token — it can only ever
+show someone files/folders that OneDrive itself already lets them open
+(the People with a specific email... sharing setting on the folder
+controls that, not this app).
+
+1. In the app registration, go to **API permissions -> Add a permission
+   -> Microsoft Graph -> Delegated permissions**.
+2. Search for and add **Files.Read.All**.
+3. Click **Grant admin consent for [your tenant]** (requires a tenant
+   admin). Without this, the first person to open the page will be
+   prompted with a Microsoft consent popup instead of the folder loading
+   silently.
+
+## 6. Set each user's name / company info
 
 These three fields auto-fill the forms the same way the old `profiles`
 table did (`flname`, `companyname`, `companyid`):
@@ -81,7 +97,7 @@ Go to **Identity -> Users -> [pick a user] -> Properties**:
 If any of these are left blank, the corresponding field on the form just
 starts empty — same fallback behavior as before, nothing breaks.
 
-## 6. Test
+## 7. Test
 
 1. Open `https://tscdcsd0811.github.io/csdtccps/` (or your custom domain,
    once/if that's ever unblocked).
@@ -99,8 +115,14 @@ starts empty — same fallback behavior as before, nothing breaks.
    or not — they no longer require sign-in. If the visitor is signed in,
    the navbar on those pages still only shows the buttons for their role.
 7. The "CSD Approved Documents" navbar link (visible only to External and
-   Admin users) opens the OneDrive folder directly in a new tab; there is
-   no longer a separate in-app page for it.
+   Admin users) opens `csd_approved_documents.html` in the same window,
+   still inside the app's navbar. It browses the shared OneDrive folder
+   in place using the signed-in user's own Graph token — no separate
+   sign-in, and no page reload when clicking into subfolders. If the
+   folder truly isn't shared with that person's account, they'll see an
+   "Access denied" message rather than a file list. The "Open in
+   OneDrive" link on that page still opens the folder directly on
+   OneDrive's own site, in a new tab, if someone prefers that.
 
 ## What changed vs. the Supabase version
 
