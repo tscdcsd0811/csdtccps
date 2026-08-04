@@ -26,11 +26,16 @@
  *       instead of redirecting a signed-out visitor to index.html, the
  *       tab just closes itself (used for the Contractor Web Tool Guide,
  *       which is only ever opened as a secondary tab from a link on a
- *       page that already required sign-in). This also happens live: if
- *       the person logs out from another tab of this app while this tab
- *       is still open, this tab closes itself immediately. A page must
- *       set a div#auth-close-fallback element for the case where the
- *       browser blocks a script-initiated tab close.
+ *       page that already required sign-in). Sign-in status is checked
+ *       via a shared "signed in" timestamp flag in localStorage (see
+ *       AUTH_FLAG_KEY below) rather than this tab's own MSAL cache,
+ *       since localStorage is instantly consistent across every tab of
+ *       this site with no cross-tab timing issues. This also means it
+ *       reacts live: if the person logs out from another tab of this
+ *       app while this tab is still open, this tab closes itself
+ *       immediately. A page must include a div#auth-close-fallback
+ *       element for the case where the browser blocks a
+ *       script-initiated tab close.
  *
  * Leave both unset on the login page (index.html).
  *
@@ -66,21 +71,31 @@
     var msalInstance = new window.msal.PublicClientApplication(window.MSAL_CONFIG);
     window.msalInstance = msalInstance; // exposed in case the page wants it (e.g. logout button)
 
-    // Cross-tab "someone logged out" signal. Each tab has its own
-    // sessionStorage (deliberately, see msal-config.js), so a logout in
-    // one tab doesn't touch another tab's MSAL cache by itself; this
-    // channel is how a CLOSE_IF_SIGNED_OUT tab finds out live.
-    var AUTH_BROADCAST_CHANNEL = "csdtccps-auth";
-    function getAuthChannel() {
-        if (typeof BroadcastChannel === "undefined") return null;
-        if (!window.__csdtccpsAuthChannel) {
-            try {
-                window.__csdtccpsAuthChannel = new BroadcastChannel(AUTH_BROADCAST_CHANNEL);
-            } catch (err) {
-                return null;
-            }
-        }
-        return window.__csdtccpsAuthChannel;
+    // A lightweight "someone is signed in" signal shared across every tab
+    // of this app via localStorage. Unlike sessionStorage (used for the
+    // MSAL cache itself — deliberately tab-scoped, see msal-config.js),
+    // localStorage is the same physical storage for every tab of this
+    // origin, with no cloning/timing quirks, so it's a reliable way for a
+    // brand-new tab (the Contractor Web Tool Guide) to know immediately
+    // whether the person opening it is signed in, and to find out live if
+    // they sign out from another tab afterwards. It only ever holds a
+    // timestamp, never any account details.
+    var AUTH_FLAG_KEY = "csdtccps-signed-in-at";
+    var AUTH_FLAG_MAX_AGE_MS = 5 * 60 * 1000; // 5 minutes
+
+    function markSignedIn() {
+        try { localStorage.setItem(AUTH_FLAG_KEY, String(Date.now())); } catch (err) { /* ignore */ }
+    }
+
+    function clearSignedInFlag() {
+        try { localStorage.removeItem(AUTH_FLAG_KEY); } catch (err) { /* ignore */ }
+    }
+
+    function isSignedInFlagFresh() {
+        var raw;
+        try { raw = localStorage.getItem(AUTH_FLAG_KEY); } catch (err) { return false; }
+        var ts = raw && parseInt(raw, 10);
+        return !!ts && (Date.now() - ts) < AUTH_FLAG_MAX_AGE_MS;
     }
 
     function closeThisTab() {
@@ -152,10 +167,7 @@
         if (!logoutBtn || logoutBtn.dataset.wired) return;
         logoutBtn.dataset.wired = "1";
         logoutBtn.addEventListener("click", function () {
-            var channel = getAuthChannel();
-            if (channel) {
-                try { channel.postMessage({ type: "logout" }); } catch (err) { /* ignore */ }
-            }
+            clearSignedInFlag();
             msalInstance.logoutRedirect({
                 account: account,
                 // onRedirectNavigate returning false stops MSAL from
@@ -188,34 +200,35 @@
             // to sign in again with a friendly explanation.
         });
 
-        var accounts = msalInstance.getAllAccounts();
-
         // CLOSE_IF_SIGNED_OUT pages (the Contractor Web Tool Guide) are
-        // opened as a brand-new tab, so they only have whatever
-        // sessionStorage the browser cloned from the opener tab at the
-        // moment they were opened. That clone isn't always reliably
-        // populated by the time this script runs, which could make a
-        // genuinely signed-in visitor look signed-out here and close
-        // the tab immediately. Before concluding that, double-check
-        // against the person's actual Microsoft sign-in session with a
-        // silent (no popup) SSO check.
-        if (!accounts.length && window.CLOSE_IF_SIGNED_OUT) {
-            try {
-                var ssoResult = await msalInstance.ssoSilent({
-                    scopes: window.MSAL_LOGIN_SCOPES || ["openid", "profile"]
-                });
-                if (ssoResult && ssoResult.account) {
-                    accounts = [ssoResult.account];
-                }
-            } catch (err) {
-                // Genuinely not signed in — fall through to the normal
-                // "no accounts" handling below, which will close the tab.
-            }
+        // opened as a brand-new tab. Check the shared flag immediately —
+        // this is synchronous and instantly consistent across tabs, so
+        // there's no waiting or guessing involved.
+        if (window.CLOSE_IF_SIGNED_OUT && !isSignedInFlagFresh()) {
+            closeThisTab();
+            return;
         }
 
+        var accounts = msalInstance.getAllAccounts();
         if (!accounts.length) {
             if (window.AUTH_OPTIONAL) {
                 revealAnonymous();
+                return;
+            }
+            if (window.CLOSE_IF_SIGNED_OUT) {
+                // The shared flag (checked above) says this person is
+                // signed in somewhere in this app, but this tab's own
+                // MSAL cache doesn't have the account (a same-origin
+                // sessionStorage-cloning edge case some browsers hit).
+                // Trust the flag rather than wrongly closing on someone
+                // who does have access — reveal the guide with generic
+                // content instead of personalized nav details.
+                document.documentElement.classList.remove("auth-checking");
+                window.addEventListener("storage", function (event) {
+                    if (event.key === AUTH_FLAG_KEY && !event.newValue) {
+                        closeThisTab();
+                    }
+                });
                 return;
             }
             goToLogin("signin_required");
@@ -276,17 +289,23 @@
 
         wireLogoutButton(account);
 
-        if (window.CLOSE_IF_SIGNED_OUT) {
-            var authChannel = getAuthChannel();
-            if (authChannel) {
-                authChannel.addEventListener("message", function (event) {
-                    if (event && event.data && event.data.type === "logout") {
-                        closeThisTab();
-                    }
-                });
-            }
-        }
+        // Keep the shared "signed in" flag fresh for as long as this tab
+        // stays open, so a Contractor Web Tool Guide tab opened later
+        // (or still open) can rely on it.
+        markSignedIn();
+        setInterval(markSignedIn, 60 * 1000);
 
+        if (window.CLOSE_IF_SIGNED_OUT) {
+            // Live: if the person logs out from another tab of this app
+            // while this tab is still open, the "storage" event fires
+            // here (never in the tab that made the change) the instant
+            // clearSignedInFlag() runs there.
+            window.addEventListener("storage", function (event) {
+                if (event.key === AUTH_FLAG_KEY && !event.newValue) {
+                    closeThisTab();
+                }
+            });
+        }
 
         // Note: there is intentionally no "change password" feature here.
         // Under Entra ID, this app never sees, stores, or handles a
